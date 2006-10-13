@@ -1,0 +1,20 @@
+########################################
+# OS X 32-bit (Intel) 
+########################################
+
+CC = cc
+
+CFLAGS = -Wall -fPIC
+
+ifeq ($(M32), yes)
+ARCHFLAG = -m32
+endif
+
+ifeq ($(DEBUG), yes)
+OPTFLAG = -O0 -g
+else
+OPTFLAG = -O2
+endif
+
+SHFLAG = -dynamiclib
+SHEXT = dylib

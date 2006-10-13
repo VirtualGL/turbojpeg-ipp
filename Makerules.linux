@@ -1,0 +1,29 @@
+########################################
+# Linux 32-bit and 64-bit
+########################################
+
+CC = cc
+
+CFLAGS = -Wall -fpic
+CDEFINES = -D_GNU_SOURCE
+
+ifeq ($(M32), yes)
+ARCHFLAG = -m32
+endif
+
+ifeq ($(DEBUG), yes)
+OPTFLAG = -O0 -ggdb
+else
+OPTFLAG = -O2
+endif
+
+DEFAULTJPEGLIB = ipp
+
+SHFLAG = -shared
+SHEXT = so
+
+ifeq ($(subplatform),)
+RPMARCH = i386
+else
+RPMARCH = $(ARCH)
+endif

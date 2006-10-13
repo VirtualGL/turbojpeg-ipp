@@ -1,0 +1,17 @@
+########################################
+# Win32 (Visual C++)
+########################################
+
+CC = "cl" -nologo
+LINK = "link" -nologo
+ifeq ($(DEBUG), yes)
+LINK = "link" -nologo -debug
+endif
+
+CFLAGS = -W3 -wd4996
+CDEFINES = -DWIN32
+ifeq ($(DEBUG), yes)
+OPTFLAG = -Od -MTd -Zi
+else
+OPTFLAG = -O2 -MT
+endif

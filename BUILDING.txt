@@ -1,0 +1,99 @@
+How to build TurboJPEG
+
+
+*******************************************************************************
+**     Linux Prerequisites
+*******************************************************************************
+
+-- GCC v2.96 or later
+
+-- GNU Make v3.7 or later
+
+-- Intel(R) Integrated Performance Primitives v4.1 or later
+
+-- RPM v4 or later (required to build a redistributable TurboJPEG package)
+
+
+*******************************************************************************
+**     Windows Prerequisites
+*******************************************************************************
+
+-- GNU Make v3.7 or later
+   * GNU Make for Win32 can be found in MSYS
+     (http://www.mingw.org/download.shtml) or Cygwin (http://www.cygwin.com/)
+
+-- Microsoft Visual C++ 2003 or later
+   * Tested with the free Visual C++ 2005 Express Edition
+     (http://msdn.microsoft.com/vstudio/express/visualc/)
+
+-- Microsoft Platform SDK
+   * See http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/
+
+-- Intel(R) Integrated Performance Primitives v4.1 or later
+   * Add the IPP include path (e.g.
+     c:\Program Files\Intel\IPP\5.1\ia32\include) to your system INCLUDE
+     environment variable prior to building TurboJPEG.
+   * Add the IPP library path (e.g. c:\Program Files\Intel\IPP\5.1\ia32\lib) to
+     your system LIB environment variable prior to building TurboJPEG.
+
+-- Nullsoft Install System (http://nsis.sourceforge.net/) required to build a
+   redistributable TurboJPEG package.  makensis.exe should be in your PATH.
+
+
+*******************************************************************************
+**     Building
+*******************************************************************************
+
+  cd turbojpeg-ipp
+  make
+
+
+*******************************************************************************
+**     Building a redistributable package
+*******************************************************************************
+
+  cd turbojpeg-ipp
+  make dist
+
+
+*******************************************************************************
+**     Makefile Options
+*******************************************************************************
+
+Each of these options can be passed as an argument to "make".
+
+-------
+General
+-------
+DEBUG = yes
+
+  * Build a version of TurboJPEG with debugging symbols and no optimization.
+    The debug version will reside in ${platform}/dbg/lib and
+    ${platform}/dbg/bin, whereas the release version will reside in
+    ${platform}/lib and ${platform}/bin, so these two versions can be built
+    independently of one another.
+
+M32 = yes
+
+  * On x86-64 systems, this cross-compiles a 32-bit (x86) version of TurboJPEG.
+
+--------------
+Linux-Specific
+--------------
+IPPDIR = {location of Intel Performance Primitives directory}
+
+  * This allows you to override the default location of
+    /opt/intel/ipp/5.1/{ia32|em64t|itanium}, for instance to use an earlier or
+    later version of IPP.
+
+IPPSHARED = yes
+
+  * Link against the IPP shared libraries rather than the static (merged)
+    libraries.  Using this option has the following ramifications:
+
+    -- The IPP run-time RPM must be installed on the build machine.
+    -- The IPP run-time RPM must be installed on any machine that will use
+       TurboJPEG.
+    -- TurboJPEG's CPU autodetection mechanism for non-Intel CPU's will no
+       longer work, and it is likely that the non-optimal (MMX) code path will
+       be selected for non-Intel CPU's at run time.
