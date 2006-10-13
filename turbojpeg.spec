@@ -1,8 +1,8 @@
 Summary: A fast JPEG codec used by VirtualGL and TurboVNC
 Name: turbojpeg
-Version: 1.03
+Version: %{_version}
 Vendor: The VirtualGL Project
-URL: http://virtualgl.sourceforge.net
+URL: http://www.virtualgl.org
 Group: System Environment/Libraries
 Release: %{_build}
 License: wxWindows Library License, v3
@@ -13,10 +13,16 @@ Provides: %{name} = %{version}-%{release}
 %description
 TurboJPEG provides a minimalistic interface for compressing true color
 bitmaps into JPEG images in memory.  It abstracts a variety of vendor-specific
-codecs from Intel, Sun, Apple, etc. into a common API that is used by
-VirtualGL and TurboVNC as the default method of image compression.  The use of
-these vendor-specific codecs allows TurboJPEG to compress HDTV resolutions
-at real-time or greater frame rates.
+JPEG codecs into a common API that is used by VirtualGL and TurboVNC as the
+default method of image compression.
+
+The Linux version of TurboJPEG is built using the Intel(R) Integrated
+Performance Primitives, a set of highly-optimized multimedia libraries for
+x86 processors.  The use of Intel(R) IPP allows TurboJPEG to compress
+1-megapixel images at 20-30 frames/sec or greater.
+
+See README.txt included in this package for information about using TurboJPEG
+with your own applications.
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -25,6 +31,7 @@ mkdir -p $RPM_BUILD_ROOT/usr/lib
 %ifarch x86_64
 mkdir -p $RPM_BUILD_ROOT/usr/lib64
 %endif
+mkdir -p $RPM_BUILD_ROOT/usr/include
 
 %ifarch x86_64
 install -m 755 %{_libdir}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg.so
@@ -32,6 +39,7 @@ install -m 755 %{_libdir32}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg
 %else
 install -m 755 %{_libdir}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg.so
 %endif
+install -m 644 turbojpeg.h $RPM_BUILD_ROOT/usr/include/turbojpeg.h
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -43,11 +51,14 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/ldconfig
 
 %files -n turbojpeg
+
 %defattr(-,root,root)
+%doc LGPL.txt LICENSE.txt README.txt
 
 /usr/lib/libturbojpeg.so
 %ifarch x86_64
 /usr/lib64/libturbojpeg.so
 %endif
+/usr/include/turbojpeg.h
 
 %changelog

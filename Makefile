@@ -1,166 +1,52 @@
-include ../Makerules
+include Makerules
 
 ##########################################################################
 ifeq ($(platform), windows)
 ##########################################################################
 
 TARGETS = $(EDIR)/turbojpeg.dll \
-          $(LDIR)/turbojpeg.lib \
-          $(EDIR)/jpgtest.exe \
-          $(EDIR)/jpegut.exe
+          $(LDIR)/turbojpeg.lib
 
-OBJS = $(ODIR)/turbojpeg.obj \
-       $(ODIR)/jpgtest.obj \
-       $(ODIR)/jpegut.obj
-
-ifeq ($(JPEGLIB),)
-JPEGLIB = $(DEFAULTJPEGLIB)
-endif
-
-ifeq ($(JPEGLIB), libjpeg)
-TARGETS := libjpeg $(TARGETS)
-endif
-
+OBJS = $(ODIR)/turbojpeg.obj
 
 all: $(TARGETS)
 
-.PHONY: libjpeg
-libjpeg:
-	cd jpeg-6b; \
-	diff -q jconfig.vc jconfig.h || cp jconfig.vc jconfig.h; \
-	$(MAKE) -f makefile.vc; cd ..
-
 clean:
 	-$(RM) $(TARGETS) $(OBJS)
-	cd jpeg-6b; $(MAKE) -f makefile.vc clean; cd ..
-
-HDRS := $(wildcard ../include/*.h)
-$(OBJS): $(HDRS)
-
-
-ifeq ($(JPEGLIB), pegasus)
-
-PEGDIR = ../../pictools
-
-$(ODIR)/turbojpeg.obj: turbojpegp.c
-	$(CC) $(CFLAGS) -DDLLDEFINE -I$(PEGDIR)/include -DWINDOWS -D__FLAT__ -c $< -Fo$@
-
-JPEGLINK = -LIBPATH:$(PEGDIR)/lib picnm.lib
-
-endif
-
-ifeq ($(JPEGLIB), libjpeg)
-
-$(ODIR)/turbojpeg.obj: turbojpegl.c
-	$(CC) -Ijpeg-6b/ $(CFLAGS) -DDLLDEFINE -c $< -Fo$@
-
-JPEGLINK = $(LDIR)/libjpeg.lib
-JPEGDEP = $(LDIR)/libjpeg.lib
-
-endif
-
-ifeq ($(JPEGLIB), ipp)
 
 IPPLINK = ippjemerged.lib ippiemerged.lib ippsemerged.lib \
 	ippjmerged.lib ippimerged.lib ippsmerged.lib ippcorel.lib
 
-$(ODIR)/turbojpeg.obj: turbojpegipp.c
+$(ODIR)/turbojpeg.obj: turbojpegipp.c turbojpeg.h
 	$(CC) $(CFLAGS) -DDLLDEFINE -c $< -Fo$@
-
-JPEGLINK = $(IPPLINK)
-
-endif
-
-ifeq ($(JPEGLIB), quicktime)
-
-$(ODIR)/turbojpeg.obj: turbojpegqt.c
-	$(CC) $(CFLAGS) -DDLLDEFINE -c $< -Fo$@
-
-JPEGLINK = qtmlClient.lib user32.lib advapi32.lib
-
-endif
 
 $(EDIR)/turbojpeg.dll $(LDIR)/turbojpeg.lib: $(ODIR)/turbojpeg.obj $(JPEGDEP)
 	$(LINK) $(LDFLAGS) -dll $< -out:$(EDIR)/turbojpeg.dll \
-		-implib:$(LDIR)/turbojpeg.lib $(JPEGLINK)
+		-implib:$(LDIR)/turbojpeg.lib $(IPPLINK)
 
-$(EDIR)/jpgtest.exe: $(ODIR)/jpgtest.obj $(LDIR)/turbojpeg.lib $(LDIR)/rrutil.lib
-	$(LINK) $(LDFLAGS) $< -out:$@ turbojpeg.lib rrutil.lib
+WBLDDIR = $(platform)$(subplatform)
 
-$(EDIR)/jpegut.exe: $(ODIR)/jpegut.obj $(LDIR)/turbojpeg.lib
-	$(LINK) $(LDFLAGS) $< -out:$@ turbojpeg.lib
+ifeq ($(DEBUG), yes)
+WBLDDIR := $(WBLDDIR)\\dbg
+endif
+
+dist: all
+	$(RM) $(WBLDDIR)\TurboJPEG.exe
+	makensis //DVERSION=$(VERSION) //DBLDDIR=$(WBLDDIR) turbojpeg.nsi || \
+	makensis /DVERSION=$(VERSION) /DBLDDIR=$(WBLDDIR) turbojpeg.nsi  # Cygwin doesn't like the //
 
 ##########################################################################
 else
 ##########################################################################
 
-ifeq ($(platform), cygwin)
-LTARGET = $(EDIR)/turbojpeg.dll \
-          $(LDIR)/turbojpeg.lib
-else
-LTARGET = $(LDIR)/libturbojpeg.$(SHEXT)
-endif
+TARGETS = $(LDIR)/libturbojpeg.$(SHEXT)
 
-TARGETS = $(EDIR)/jpgtest \
-          $(EDIR)/jpegut
-
-OBJS = $(ODIR)/turbojpeg.o \
-       $(ODIR)/jpgtest.o \
-       $(ODIR)/jpegut.o
-
-ifeq ($(JPEGLIB),)
-JPEGLIB = $(DEFAULTJPEGLIB)
-endif
-
-ifeq ($(JPEGLIB), libjpeg)
-LTARGET := libjpeg $(LTARGET)
-endif
-
-ifeq ($(platform), linux)
-LDEP =
-else
-TARGETS := $(TARGETS) $(LTARGET)
-LDEP := $(LTARGET)
-endif
-
+OBJS = $(ODIR)/turbojpeg.o
 
 all: $(TARGETS)
-lib: $(LTARGET)
-
-.PHONY: libjpeg
-libjpeg:
-	cd jpeg-6b; sh configure CC=$(CC); $(MAKE); cd ..
 
 clean:
-	-$(RM) $(TARGETS) $(LTARGET) $(OBJS) $(OBJS:.o=.d)
-	cd jpeg-6b; \
-	$(MAKE) clean || (sh configure CC=$(CC); $(MAKE) clean); cd ..
-
--include $(OBJS:.o=.d)
-
-
-ifeq ($(JPEGLIB), pegasus)
-
-PEGDIR = ../../pictools
-
-$(ODIR)/turbojpeg.o: turbojpegp.c ../include/turbojpeg.h
-	$(CC) $(CFLAGS) -I$(PEGDIR)/include -c $< -o $@
-
-JPEGLINK = -L$(PEGDIR)/lib -lpicl20
-
-endif
-
-ifeq ($(JPEGLIB), libjpeg)
-
-$(ODIR)/turbojpeg.o: turbojpegl.c ../include/turbojpeg.h
-	$(CC) -Ijpeg-6b/ $(CFLAGS) -c $< -o $@
-
-JPEGLINK = $(LDIR)/libjpeg.a
-JPEGDEP = $(LDIR)/libjpeg.a
-
-endif
-
-ifeq ($(JPEGLIB), ipp)
+	-$(RM) $(TARGETS) $(OBJS)
 
 ifeq ($(IPPDIR),)
 IPPDIR = /opt/intel/ipp/5.1/ia32
@@ -171,6 +57,7 @@ ifeq ($(subplatform), ia64)
 IPPDIR = /opt/intel/ipp/5.1/itanium
 endif
 endif
+
 IPPLINK = -L$(IPPDIR)/lib -lippcore \
         -lippjemerged -lippiemerged -lippsemerged \
         -lippjmerged -lippimerged -lippsmerged
@@ -178,6 +65,7 @@ ifeq ($(IPPSHARED), yes)
 IPPLINK = -L$(IPPDIR)/sharedlib \
         -lippj -lippi -lipps -lippcore
 endif
+
 ifeq ($(subplatform), 64)
 IPPLINK = -L$(IPPDIR)/lib \
         -lippjemergedem64t -lippjmergedem64t -lippiemergedem64t \
@@ -188,76 +76,37 @@ IPPLINK = -L$(IPPDIR)/sharedlib \
         -lippjem64t -lippiem64t -lippsem64t -lippcoreem64t
 endif
 endif
+
 ifeq ($(subplatform), ia64)
 IPPLINK = -L$(IPPDIR)/lib \
         -lippji7 -lippii7 -lippsi7 -lippcore64
 endif
 
-$(ODIR)/turbojpeg.o: turbojpegipp.c ../include/turbojpeg.h
+$(ODIR)/turbojpeg.o: turbojpegipp.c turbojpeg.h
 	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
 
-JPEGLINK = $(IPPLINK)
-
-endif
-
-ifeq ($(JPEGLIB), quicktime)
-
-$(ODIR)/turbojpeg.o: turbojpegqt.c
-	$(CC)  $(CFLAGS) -c $< -o $@
-
-JPEGLINK = -framework ApplicationServices -framework CoreFoundation -framework CoreServices -framework QuickTime
-
-endif
-
-ifeq ($(JPEGLIB), medialib)
-
-$(ODIR)/turbojpeg.o: turbojpeg-mlib.c turbojpeg-mlibhuff.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-JPEGLINK = -lmlib
-
-endif
-
-$(EDIR)/turbojpeg.dll $(LDIR)/turbojpeg.lib $(LDIR)/turbojpeg.def: $(ODIR)/turbojpeg.o $(JPEGDEP)
-	$(CC) $(LDFLAGS) -shared $< -o $@ -Wl,-out-implib,$(LDIR)/turbojpeg.lib \
-		-Wl,--output-def,$(LDIR)/turbojpeg.def $(JPEGLINK)
-
 $(LDIR)/libturbojpeg.$(SHEXT): $(ODIR)/turbojpeg.o $(JPEGDEP)
-	$(CC) $(LDFLAGS) $(SHFLAG) $< -o $@ $(JPEGLINK)
-
-$(EDIR)/jpgtest: $(ODIR)/jpgtest.o $(LDEP) $(LDIR)/librrutil.a
-	$(CXX) $(LDFLAGS) $< -o $@ -lturbojpeg -lrrutil
-
-$(EDIR)/jpegut: $(ODIR)/jpegut.o $(LDEP)
-	$(CC) $(LDFLAGS) $< -o $@ -lturbojpeg
+	$(CC) $(LDFLAGS) $(SHFLAG) $< -o $@ $(IPPLINK)
 
 ifeq ($(platform), linux)
 
 ifeq ($(subplatform), 64)
-lib32:
-	$(MAKE) M32=yes lib
+all32:
+	$(MAKE) M32=yes
 else
-lib32:
+all32:
 endif
 
-TJPEGBUILD = 1
-ifeq ($(JPEGLIB), ipp)
-TJPEGBUILD = 1ipp
-endif
-ifeq ($(JPEGLIB), pegasus)
-TJPEGBUILD = 1peg
-endif
-
-dist: lib lib32
+dist: all all32
 	if [ -d $(BLDDIR)/rpms ]; then rm -rf $(BLDDIR)/rpms; fi
 	mkdir -p $(BLDDIR)/rpms/RPMS
 	ln -fs `pwd` $(BLDDIR)/rpms/BUILD
 	rm -f $(BLDDIR)/$(PACKAGENAME).$(RPMARCH).rpm; \
 	rpmbuild -bb --define "_blddir `pwd`/$(BLDDIR)" --define "_topdir $(BLDDIR)/rpms" \
-		--define "_bindir $(EDIR)" --define "_bindir32 $(EDIR32)" --define "_build $(TJPEGBUILD)" \
+		--define "_bindir $(EDIR)" --define "_bindir32 $(EDIR32)" --define "_build $(BUILD)" \
 		--define "_libdir $(LDIR)" --define "_libdir32 $(LDIR32)" --target $(RPMARCH) \
-		turbojpeg.spec; \
-	mv $(BLDDIR)/rpms/RPMS/$(RPMARCH)/turbojpeg-1.03-$(TJPEGBUILD).$(RPMARCH).rpm $(BLDDIR)
+		--define "_version $(VERSION)" turbojpeg.spec; \
+	mv $(BLDDIR)/rpms/RPMS/$(RPMARCH)/turbojpeg-$(VERSION)-$(BUILD).$(RPMARCH).rpm $(BLDDIR)/turbojpeg-$(VERSION).$(RPMARCH).rpm
 	rm -rf $(BLDDIR)/rpms
 
 endif
