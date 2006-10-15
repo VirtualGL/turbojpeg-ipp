@@ -10,8 +10,29 @@ How to build TurboJPEG
 -- GNU Make v3.7 or later
 
 -- Intel(R) Integrated Performance Primitives v4.1 or later
+   * See http://www.intel.com/software/products/ipp/index.htm
 
 -- RPM v4 or later (required to build a redistributable TurboJPEG package)
+
+
+*******************************************************************************
+**     Mac OS X (Intel) Prerequisites
+*******************************************************************************
+
+-- GCC v3.3 or later
+   * Available in the Xcode package on the OS X install disc or from
+     http://developer.apple.com/tools/xcode
+
+-- GNU Make v3.7 or later
+   * Should already be installed
+
+-- Intel(R) Integrated Performance Primitives v5.1.1 or later
+   * See http://www.intel.com/software/products/ipp/index.htm
+
+-- OS X PackageMaker (part of the O/S)
+   * The TurboJPEG build tries to find this in its default location, but you
+     can specify an alternate location by setting the PACKAGEMAKER Makefile
+     variable (see the Makefile Options section below.)
 
 
 *******************************************************************************
@@ -30,6 +51,7 @@ How to build TurboJPEG
    * See http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/
 
 -- Intel(R) Integrated Performance Primitives v4.1 or later
+   * See http://www.intel.com/software/products/ipp/index.htm
    * Add the IPP include path (e.g.
      c:\Program Files\Intel\IPP\5.1\ia32\include) to your system INCLUDE
      environment variable prior to building TurboJPEG.
@@ -97,3 +119,11 @@ IPPSHARED = yes
     -- TurboJPEG's CPU autodetection mechanism for non-Intel CPU's will no
        longer work, and it is likely that the non-optimal (MMX) code path will
        be selected for non-Intel CPU's at run time.
+
+--------------
+MacOS-Specific
+--------------
+PACKAGEMAKER = {Location of PackageMaker executable}
+
+  * Default location =
+    /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker
