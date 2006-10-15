@@ -19,9 +19,6 @@ endif
 
 DEFAULTJPEGLIB = ipp
 
-SHFLAG = -shared
-SHEXT = so
-
 ifeq ($(subplatform),)
 RPMARCH = i386
 else
