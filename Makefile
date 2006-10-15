@@ -54,7 +54,7 @@ IPPLINK = -L$(IPPDIR)/Libraries -lippj -lippi -lipps -lippcore -lguide \
           -install_name libturbojpeg.dylib
 
 $(ODIR)/turbojpeg.o: turbojpegipp.c turbojpeg.h
-	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
+	$(CC) -I$(IPPDIR)/Headers $(CFLAGS) -c $< -o $@
 
 $(LDIR)/libturbojpeg.dylib: $(ODIR)/turbojpeg.o
 	$(CC) $(LDFLAGS) -dynamiclib  $< -o $@ $(IPPLINK)
@@ -62,8 +62,9 @@ $(LDIR)/libturbojpeg.dylib: $(ODIR)/turbojpeg.o
 PACKAGEMAKER = /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker
 
 dist: all
-	if [ -d $(BLDDIR)/TurboJPEG.pkg ]; then rm -rf $(BLDDIR)/TurboJPEG.pkg; fi
+	if [ -d $(BLDDIR)/TurboJPEG-$(VERSION).pkg ]; then rm -rf $(BLDDIR)/TurboJPEG-$(VERSION).pkg; fi
 	if [ -d $(BLDDIR)/pkgbuild ]; then sudo rm -rf $(BLDDIR)/pkgbuild; fi
+	if [ -f $(BLDDIR)/TurboJPEG-$(VERSION).dmg ]; then rm -f $(BLDDIR)/TurboJPEG-$(VERSION).dmg; fi
 	mkdir -p $(BLDDIR)/pkgbuild
 	mkdir -p $(BLDDIR)/pkgbuild/Package_Root/usr/lib
 	mkdir -p $(BLDDIR)/pkgbuild/Package_Root/usr/include
@@ -83,6 +84,10 @@ dist: all
 	  -f $(BLDDIR)/pkgbuild/Package_Root -r $(BLDDIR)/pkgbuild/Resources \
 	  -i Info.plist -d TurboJPEG.info
 	sudo rm -rf $(BLDDIR)/pkgbuild
+	hdiutil create -fs HFS+ -volname TurboJPEG-$(VERSION) \
+	  -srcfolder $(BLDDIR)/TurboJPEG-$(VERSION).pkg \
+	  $(BLDDIR)/TurboJPEG-$(VERSION).dmg
+	rm -rf $(BLDDIR)/TurboJPEG-$(VERSION).pkg
 
 ##########################################################################
 else
