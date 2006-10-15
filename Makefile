@@ -37,9 +37,58 @@ dist: all
 
 ##########################################################################
 else
+ifeq ($(platform), osxx86)
 ##########################################################################
 
-TARGETS = $(LDIR)/libturbojpeg.$(SHEXT)
+TARGETS = $(LDIR)/libturbojpeg.dylib
+
+OBJS = $(ODIR)/turbojpeg.o
+
+all: $(TARGETS)
+
+clean:
+	-$(RM) $(TARGETS) $(OBJS)
+
+IPPDIR = /Library/Frameworks/Intel_IPP.framework
+IPPLINK = -L$(IPPDIR)/Libraries -lippj -lippi -lipps -lippcore -lguide \
+          -install_name libturbojpeg.dylib
+
+$(ODIR)/turbojpeg.o: turbojpegipp.c turbojpeg.h
+	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
+
+$(LDIR)/libturbojpeg.dylib: $(ODIR)/turbojpeg.o
+	$(CC) $(LDFLAGS) -dynamiclib  $< -o $@ $(IPPLINK)
+
+PACKAGEMAKER = /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker
+
+dist: all
+	if [ -d $(BLDDIR)/TurboJPEG.pkg ]; then rm -rf $(BLDDIR)/TurboJPEG.pkg; fi
+	if [ -d $(BLDDIR)/pkgbuild ]; then sudo rm -rf $(BLDDIR)/pkgbuild; fi
+	mkdir -p $(BLDDIR)/pkgbuild
+	mkdir -p $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	mkdir -p $(BLDDIR)/pkgbuild/Package_Root/usr/include
+	mkdir -p $(BLDDIR)/pkgbuild/Resources
+	cp -R $(IPPDIR)/Libraries/libippi*.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	cp -R $(IPPDIR)/Libraries/libippj*.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	cp -R $(IPPDIR)/Libraries/libipps[^rc]* $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	cp -R $(IPPDIR)/Libraries/libippcore*.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	cp -R $(IPPDIR)/Libraries/libguide.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	cp $(LDIR)/libturbojpeg.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	cp turbojpeg.h $(BLDDIR)/pkgbuild/Package_Root/usr/include
+	chmod 755 $(BLDDIR)/pkgbuild/Package_Root/usr/lib/*
+	chmod 644 $(BLDDIR)/pkgbuild/Package_Root/usr/include/*
+	sudo chown -R root:wheel $(BLDDIR)/pkgbuild/Package_Root/*
+	cp License.rtf Welcome.rtf ReadMe.rtf $(BLDDIR)/pkgbuild/Resources/
+	$(PACKAGEMAKER) -build -v -p $(BLDDIR)/TurboJPEG-$(VERSION).pkg \
+	  -f $(BLDDIR)/pkgbuild/Package_Root -r $(BLDDIR)/pkgbuild/Resources \
+	  -i Info.plist -d TurboJPEG.info
+	sudo rm -rf $(BLDDIR)/pkgbuild
+
+##########################################################################
+else
+##########################################################################
+
+TARGETS = $(LDIR)/libturbojpeg.so
 
 OBJS = $(ODIR)/turbojpeg.o
 
@@ -85,8 +134,8 @@ endif
 $(ODIR)/turbojpeg.o: turbojpegipp.c turbojpeg.h
 	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
 
-$(LDIR)/libturbojpeg.$(SHEXT): $(ODIR)/turbojpeg.o $(JPEGDEP)
-	$(CC) $(LDFLAGS) $(SHFLAG) $< -o $@ $(IPPLINK)
+$(LDIR)/libturbojpeg.so: $(ODIR)/turbojpeg.o
+	$(CC) $(LDFLAGS) -shared $< -o $@ $(IPPLINK)
 
 ifeq ($(platform), linux)
 
@@ -112,5 +161,6 @@ dist: all all32
 endif
 
 ##########################################################################
+endif
 endif
 ##########################################################################
