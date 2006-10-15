@@ -1,0 +1,26 @@
+Title TurboJPEG
+Version 1.03
+Description TurboJPEG provides a minimalistic interface for compressing true color
+bitmaps into JPEG images in memory.  It abstracts a variety of vendor-specific JPEG codecs into a common API that is used by VirtualGL and TurboVNC as the default method of image compression.
+
+The Mac version of TurboJPEG is built using the Intel¨ Integrated
+Performance Primitives, a set of highly-optimized multimedia libraries for
+x86 processors.  The use of Intel¨ IPP allows TurboJPEG to compress
+1-megapixel images at 20-30 frames/sec or greater.
+
+See the ReadMe file included with this package for information about using TurboJPEG with your own applications.
+
+DefaultLocation /
+DeleteWarning 
+
+### Package Flags
+
+NeedsAuthorization YES
+Required NO
+Relocatable NO
+RequiresReboot NO
+UseUserMask NO
+OverwritePermissions NO
+InstallFat NO
+RootVolumeOnly NO
+OnlyUpdateInstalledLanguages NO
