@@ -16,5 +16,6 @@ else
 OPTFLAG = -O2
 endif
 
-SHFLAG = -dynamiclib
-SHEXT = dylib
+ifeq ($(IPPSHARED), yes)
+LDFLAGS = -flat_namespace -undefined suppress
+endif

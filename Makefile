@@ -50,8 +50,14 @@ clean:
 	-$(RM) $(TARGETS) $(OBJS)
 
 IPPDIR = /Library/Frameworks/Intel_IPP.framework
+IPPLINK = -L$(IPPDIR)/Libraries $(IPPDIR)/Libraries/libippcore.a \
+        -lippjemerged -lippiemerged -lippsemerged \
+        -lippjmerged -lippimerged -lippsmerged \
+        -install_name libturbojpeg.dylib -read_only_relocs warning
+ifeq ($(IPPSHARED), yes)
 IPPLINK = -L$(IPPDIR)/Libraries -lippj -lippi -lipps -lippcore -lguide \
           -install_name libturbojpeg.dylib
+endif
 
 $(ODIR)/turbojpeg.o: turbojpegipp.c turbojpeg.h
 	$(CC) -I$(IPPDIR)/Headers $(CFLAGS) -c $< -o $@
@@ -69,11 +75,6 @@ dist: all
 	mkdir -p $(BLDDIR)/pkgbuild/Package_Root/usr/lib
 	mkdir -p $(BLDDIR)/pkgbuild/Package_Root/usr/include
 	mkdir -p $(BLDDIR)/pkgbuild/Resources
-	cp -R $(IPPDIR)/Libraries/libippi*.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
-	cp -R $(IPPDIR)/Libraries/libippj*.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
-	cp -R $(IPPDIR)/Libraries/libipps[^rc]* $(BLDDIR)/pkgbuild/Package_Root/usr/lib
-	cp -R $(IPPDIR)/Libraries/libippcore*.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
-	cp -R $(IPPDIR)/Libraries/libguide.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
 	cp $(LDIR)/libturbojpeg.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
 	cp turbojpeg.h $(BLDDIR)/pkgbuild/Package_Root/usr/include
 	chmod 755 $(BLDDIR)/pkgbuild/Package_Root/usr/lib/*
