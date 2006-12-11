@@ -35,13 +35,13 @@
 
 #define CACHE_LINE 32
 
-static const char *lasterror="No error";
+static char lasterror[1024]="No error";
 static const int _mcuw[NUMSUBOPT]={8, 16, 16};
 static const int _mcuh[NUMSUBOPT]={8, 8, 16};
 static int ippstaticinitcalled=0;
 
 #define checkhandle(h) jpgstruct *jpg=(jpgstruct *)h; \
-	if(!jpg) {lasterror="Invalid handle";  return -1;}
+	if(!jpg) {snprintf(lasterror, 1023, "%d: Invalid handle", __LINE__);  return -1;}
 
 #if IPP_VERSION_MAJOR>=5
 #define ippCoreGetStatusString ippGetStatusString
@@ -49,9 +49,9 @@ static int ippstaticinitcalled=0;
 #define ippStaticInitBest ippStaticInit
 #endif
 
-#define _throw(c) {lasterror=c;  return -1;}
+#define _throw(c) {snprintf(lasterror, 1023, "%d: %s", __LINE__, c);  return -1;}
 #define _ipp(a) {IppStatus __err;  if((__err=(a))<ippStsNoErr) _throw(ippCoreGetStatusString(__err));}
-#define _ippn(a) {IppStatus __err;  if((__err=(a))<ippStsNoErr) {lasterror=ippCoreGetStatusString(__err); return NULL;}}
+#define _ippn(a) {IppStatus __err;  if((__err=(a))<ippStsNoErr) {snprintf(lasterror, 1023, "%d: %s", __LINE__, ippCoreGetStatusString(__err)); return NULL;}}
 #define _catch(a) {if((a)==-1) return -1;}
 
 #ifndef max
@@ -564,7 +564,7 @@ DLLEXPORT tjhandle DLLCALL tjInitCompress(void)
 	jpgstruct *jpg;  int huffbufsize;
 
 	if((jpg=(jpgstruct *)malloc(sizeof(jpgstruct)))==NULL)
-		{lasterror="Memory allocation failure";  return NULL;}
+		{snprintf(lasterror, 1023, "%d: Memory allocation failure", __LINE__);  return NULL;}
 	memset(jpg, 0, sizeof(jpgstruct));
 
 	if(!ippstaticinitcalled)
@@ -583,7 +583,7 @@ DLLEXPORT tjhandle DLLCALL tjInitCompress(void)
 
 	_ippn(ippiEncodeHuffmanStateGetBufSize_JPEG_8u(&huffbufsize));
 	if((jpg->e_huffstate=(IppiEncodeHuffmanState *)ippMalloc(huffbufsize))==NULL)
-		{lasterror="Memory Allocation failure";  return NULL;}
+		{snprintf(lasterror, 1023, "%d: Memory Allocation failure", __LINE__);  return NULL;}
 
 	jpg->lumqtable=(Ipp16u *)ippAlignPtr(jpg->__lumqtable, 8);
 	jpg->chromqtable=(Ipp16u *)ippAlignPtr(jpg->__chromqtable, 8);
@@ -594,7 +594,7 @@ DLLEXPORT tjhandle DLLCALL tjInitCompress(void)
 	|| (jpg->e_aclumtable=(IppiEncodeHuffmanSpec *)ippMalloc(huffbufsize))==NULL
 	|| (jpg->e_dcchromtable=(IppiEncodeHuffmanSpec *)ippMalloc(huffbufsize))==NULL
 	|| (jpg->e_acchromtable=(IppiEncodeHuffmanSpec *)ippMalloc(huffbufsize))==NULL)
-		{lasterror="Memory Allocation failure";  return NULL;}
+		{snprintf(lasterror, 1023, "%d: Memory Allocation failure", __LINE__);  return NULL;}
 
 	jpg->initc=1;
 
@@ -604,7 +604,7 @@ DLLEXPORT tjhandle DLLCALL tjInitCompress(void)
 DLLEXPORT unsigned long DLLCALL TJBUFSIZE(int width, int height)
 {
 	// This allows enough room in case the image doesn't compress
-	return ((width+15)&(~15)) * ((height+15)&(~15)) * 3 + 2048;
+	return ((width+15)&(~15)) * ((height+15)&(~15)) * 6 + 2048;
 }
 
 DLLEXPORT int DLLCALL tjCompress(tjhandle h,
@@ -953,7 +953,7 @@ DLLEXPORT tjhandle DLLCALL tjInitDecompress(void)
 	jpgstruct *jpg;  int huffbufsize;
 
 	if((jpg=(jpgstruct *)malloc(sizeof(jpgstruct)))==NULL)
-		{lasterror="Memory allocation failure";  return NULL;}
+		{snprintf(lasterror, 1023, "%d: Memory allocation failure", __LINE__);  return NULL;}
 	memset(jpg, 0, sizeof(jpgstruct));
 
 	if(!ippstaticinitcalled)
@@ -972,7 +972,7 @@ DLLEXPORT tjhandle DLLCALL tjInitDecompress(void)
 
 	_ippn(ippiDecodeHuffmanStateGetBufSize_JPEG_8u(&huffbufsize));
 	if((jpg->d_huffstate=(IppiDecodeHuffmanState *)ippMalloc(huffbufsize))==NULL)
-		{lasterror="Memory Allocation failure";  return NULL;}
+		{snprintf(lasterror, 1023,"%d: Memory Allocation failure", __LINE__);  return NULL;}
 
 	jpg->lumqtable=(Ipp16u *)ippAlignPtr(jpg->__lumqtable, 8);
 	jpg->chromqtable=(Ipp16u *)ippAlignPtr(jpg->__chromqtable, 8);
@@ -983,7 +983,7 @@ DLLEXPORT tjhandle DLLCALL tjInitDecompress(void)
 	|| (jpg->d_aclumtable=(IppiDecodeHuffmanSpec *)ippMalloc(huffbufsize))==NULL
 	|| (jpg->d_dcchromtable=(IppiDecodeHuffmanSpec *)ippMalloc(huffbufsize))==NULL
 	|| (jpg->d_acchromtable=(IppiDecodeHuffmanSpec *)ippMalloc(huffbufsize))==NULL)
-		{lasterror="Memory Allocation failure";  return NULL;}
+		{snprintf(lasterror, 1023, "%d: Memory Allocation failure", __LINE__);  return NULL;}
 
 	jpg->initd=1;
 	return (tjhandle)jpg;
