@@ -16,6 +16,7 @@
 
 #ifdef _WIN32
  #include <windows.h>
+ #define snprintf _snprintf
  #if defined(_X86_) || defined(_AMD64_)
  #define USECPUID
  #endif
