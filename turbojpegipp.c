@@ -37,8 +37,8 @@
 #define CACHE_LINE 32
 
 static char lasterror[1024]="No error";
-static const int _mcuw[NUMSUBOPT]={8, 16, 16};
-static const int _mcuh[NUMSUBOPT]={8, 8, 16};
+static const int _mcuw[NUMSUBOPT]={8, 16, 16, 8};
+static const int _mcuh[NUMSUBOPT]={8, 8, 16, 8};
 static int ippstaticinitcalled=0;
 
 #define checkhandle(h) jpgstruct *jpg=(jpgstruct *)h; \
@@ -349,7 +349,7 @@ static int e_mcu_color_convert(jpgstruct *jpg, int curxmcu, int curymcu)
 	if(curxmcu==jpg->xmcus-1 && jpg->width%mcuw!=0) w=jpg->width%mcuw;
 	if(curymcu==jpg->ymcus-1 && jpg->height%mcuh!=0) h=jpg->height%mcuh;
 
-	if(jpg->flags&TJ_GRAYSCALE)
+	if(jpg->subsamp==TJ_GRAYSCALE)
 	{
 		int rindex=jpg->flags&TJ_BGR? 2:0, bindex=jpg->flags&TJ_BGR? 0:2;
 		unsigned char *tmpptr=bmpptr, *tmpptr2;
@@ -518,7 +518,7 @@ static int encode_jpeg_init(jpgstruct *jpg)
 	write_byte(jpg, 0);  // Index for luminance
 	for(i=0; i<64; i++) write_byte(jpg, rawqtable[i]);
 
-	if(!(jpg->flags&TJ_GRAYSCALE))
+	if(jpg->subsamp!=TJ_GRAYSCALE)
 	{
 		memcpy(rawqtable, chromqtable, 64);
 		_ipp(ippiQuantFwdRawTableInit_JPEG_8u(rawqtable, jpg->qual));
@@ -547,7 +547,7 @@ static int encode_jpeg_init(jpgstruct *jpg)
 	for(i=0; i<16; i++) write_byte(jpg, aclumbits[i]);
 	for(i=0; i<nval; i++) write_byte(jpg, aclumvals[i]);
 
-	if(!(jpg->flags&TJ_GRAYSCALE))
+	if(jpg->subsamp!=TJ_GRAYSCALE)
 	{
 		write_byte(jpg, 0xff);  write_byte(jpg, 0xc4);  // DHT marker
 		nval=0;  for(i=0; i<16; i++) nval+=dcchrombits[i];
@@ -569,7 +569,7 @@ static int encode_jpeg_init(jpgstruct *jpg)
 	// Initialize Huffman tables
 	_ipp(ippiEncodeHuffmanSpecInit_JPEG_8u(dclumbits, dclumvals, jpg->e_dclumtable));
 	_ipp(ippiEncodeHuffmanSpecInit_JPEG_8u(aclumbits, aclumvals, jpg->e_aclumtable));
-	if(!(jpg->flags&TJ_GRAYSCALE))
+	if(jpg->subsamp!=TJ_GRAYSCALE)
 	{
 		_ipp(ippiEncodeHuffmanSpecInit_JPEG_8u(dcchrombits, dcchromvals, jpg->e_dcchromtable));
 		_ipp(ippiEncodeHuffmanSpecInit_JPEG_8u(acchrombits, acchromvals, jpg->e_acchromtable));
@@ -577,16 +577,16 @@ static int encode_jpeg_init(jpgstruct *jpg)
 
 	// Write Start Of Frame
 	write_byte(jpg, 0xff);  write_byte(jpg, 0xc0);  // SOF marker
-	write_word(jpg, (jpg->flags&TJ_GRAYSCALE? 11:17));  // SOF length
+	write_word(jpg, (jpg->subsamp==TJ_GRAYSCALE? 11:17));  // SOF length
 	write_byte(jpg, 8);  // precision
 	write_word(jpg, jpg->height);
 	write_word(jpg, jpg->width);
-	write_byte(jpg, (jpg->flags&TJ_GRAYSCALE? 1:3));  // Number of components
+	write_byte(jpg, (jpg->subsamp==TJ_GRAYSCALE? 1:3));  // Number of components
 
 	write_byte(jpg, 1);  // Y Component ID
 	write_byte(jpg, ((mcuw/8)<<4)+(mcuh/8));  // Horiz. and Vert. sampling factors
 	write_byte(jpg, 0);  // Quantization table selector
-	if(!(jpg->flags&TJ_GRAYSCALE))
+	if(jpg->subsamp!=TJ_GRAYSCALE)
 	{
 		for(i=2; i<=3; i++)
 		{
@@ -598,9 +598,9 @@ static int encode_jpeg_init(jpgstruct *jpg)
 
 	// Write Start of Scan
 	write_byte(jpg, 0xff);  write_byte(jpg, 0xda);  // SOS marker
-	write_word(jpg, (jpg->flags&TJ_GRAYSCALE? 8:12));  // SOS length
-	write_byte(jpg, (jpg->flags&TJ_GRAYSCALE? 1:3));  // Number of components
-	for(i=1; i<=(jpg->flags&TJ_GRAYSCALE? 1:3); i++)
+	write_word(jpg, (jpg->subsamp==TJ_GRAYSCALE? 8:12));  // SOS length
+	write_byte(jpg, (jpg->subsamp==TJ_GRAYSCALE? 1:3));  // Number of components
+	for(i=1; i<=(jpg->subsamp==TJ_GRAYSCALE? 1:3); i++)
 	{
 		write_byte(jpg, i);  // Component ID
 		write_byte(jpg, i==1? 0 : 0x11);  // Huffman table selector
@@ -616,7 +616,7 @@ static int encode_jpeg(jpgstruct *jpg)
 {
 	int i, j, k, pos;
 	int mcuw=_mcuw[jpg->subsamp], mcuh=_mcuh[jpg->subsamp];
-	int mcusize=mcuw*mcuh+(jpg->flags&TJ_GRAYSCALE? 0:128);
+	int mcusize=mcuw*mcuh+(jpg->subsamp==TJ_GRAYSCALE? 0:128);
 	Ipp16s lastdc[3]={0, 0, 0};
 
 	_catch(encode_jpeg_init(jpg));
@@ -632,7 +632,7 @@ static int encode_jpeg(jpgstruct *jpg)
 
 			for(k=0; k<mcuw*mcuh; k+=64)  // Quantize the luminance blocks
 				_ipp(ippiQuantFwd8x8_JPEG_16s_C1I(&jpg->mcubuf[k], jpg->lumqtable));
-			if(!(jpg->flags&TJ_GRAYSCALE))
+			if(jpg->subsamp!=TJ_GRAYSCALE)
 			{
 				for(k=mcuw*mcuh; k<mcusize; k+=64)  // Quantize the chrominance blocks
 					_ipp(ippiQuantFwd8x8_JPEG_16s_C1I(&jpg->mcubuf[k], jpg->chromqtable));
@@ -647,7 +647,7 @@ static int encode_jpeg(jpgstruct *jpg)
 				jpg->jpgptr+=pos;  jpg->bytesprocessed+=pos;  jpg->bytesleft-=pos;
 			}
 
-			if(!(jpg->flags&TJ_GRAYSCALE))
+			if(jpg->subsamp!=TJ_GRAYSCALE)
 			{
 				// Huffman encode the Cb block
 				pos=0;
@@ -758,8 +758,6 @@ DLLEXPORT int DLLCALL tjCompress(tjhandle h,
 	jpg->ps=ps;  jpg->subsamp=jpegsub;  jpg->qual=qual;  jpg->flags=flags;
 	jpg->bytesleft=TJBUFSIZE(width, height);
 
-	if(flags&TJ_GRAYSCALE) jpg->subsamp=TJ_444;
-
 	_catch(encode_jpeg(jpg));
 
 	*size=jpg->bytesprocessed;
@@ -809,7 +807,7 @@ static int d_mcu_color_convert(jpgstruct *jpg, int curxmcu, int curymcu)
 
 	imgsize.width=w;  imgsize.height=h;
 
-	if(jpg->flags&TJ_GRAYSCALE)
+	if(jpg->subsamp==TJ_GRAYSCALE)
 	{
 		int pitch=jpg->pitch, i, j;
 		if(jpg->flags&TJ_BOTTOMUP) pitch=-pitch;
@@ -900,7 +898,7 @@ static int decode_jpeg_init(jpgstruct *jpg)
 {
 	Ipp8u rawqtable[64], rawhuffbits[16], rawhuffvalues[256];
 	int i;  unsigned char tempbyte, marker;  unsigned short tempword, length;
-	int markerread=0;  unsigned char compid[3];
+	int markerread=0;  unsigned char compid[3], ncomp;
 
 	jpg->bytesprocessed=0;
 	jpg->jpgptr=jpg->jpgbuf;
@@ -1002,18 +1000,21 @@ static int decode_jpeg_init(jpgstruct *jpg)
 				read_word(jpg, tempword);  // width
 				if(!jpg->width) jpg->width=tempword;
 				if(tempword!=jpg->width) _throw("Width mismatch between JPEG and bitmap");
-				read_byte(jpg, tempbyte);  // Number of components
-				if(tempbyte==1) jpg->flags|=TJ_GRAYSCALE;
-				else if(tempbyte!=3) _throw("Only YCbCr and grayscale JPEG's are supported");
-				if(length<(8+3*tempbyte)) _throw("Invalid SOF length");
+				read_byte(jpg, ncomp);  // Number of components
+				if(ncomp==1) jpg->subsamp=TJ_GRAYSCALE;
+				else if(ncomp!=3) _throw("Only YCbCr and grayscale JPEG's are supported");
+				if(length<(8+3*ncomp)) _throw("Invalid SOF length");
 				read_byte(jpg, compid[0]);  // Component ID
 				read_byte(jpg, tempbyte);  // Horiz. and Vert. sampling factors
-				if(tempbyte==0x11) jpg->subsamp=TJ_444;
-				else if(tempbyte==0x21) jpg->subsamp=TJ_422;
-				else if(tempbyte==0x22) jpg->subsamp=TJ_411;
-				else _throw("Unsupported subsampling type");
+				if(ncomp==3)
+				{
+					if(tempbyte==0x11) jpg->subsamp=TJ_444;
+					else if(tempbyte==0x21) jpg->subsamp=TJ_422;
+					else if(tempbyte==0x22) jpg->subsamp=TJ_411;
+					else _throw("Unsupported subsampling type");
+				}
 				check_byte(jpg, 0);  // Luminance
-				if(!(jpg->flags&TJ_GRAYSCALE))
+				if(jpg->subsamp!=TJ_GRAYSCALE)
 				{
 					for(i=1; i<3; i++)
 					{
@@ -1025,12 +1026,12 @@ static int decode_jpeg_init(jpgstruct *jpg)
 				markerread+=128;
 				break;
 			case 0xda:  // SOS
-				if(markerread!= (jpg->flags&TJ_GRAYSCALE? 155:255))
+				if(markerread!= (jpg->subsamp==TJ_GRAYSCALE? 155:255))
 					_throw("JPEG bitstream error");
 				read_word(jpg, length);
-				if(length< (jpg->flags&TJ_GRAYSCALE? 8:12)) _throw("JPEG bitstream error");
-				check_byte(jpg, (jpg->flags& TJ_GRAYSCALE? 1:3));  // Number of components
-				for(i=0; i<(jpg->flags&TJ_GRAYSCALE? 1:3); i++)
+				if(length< (jpg->subsamp==TJ_GRAYSCALE? 8:12)) _throw("JPEG bitstream error");
+				check_byte(jpg, (jpg->subsamp==TJ_GRAYSCALE? 1:3));  // Number of components
+				for(i=0; i<(jpg->subsamp==TJ_GRAYSCALE? 1:3); i++)
 				{
 					check_byte(jpg, compid[i])
 					check_byte(jpg, i==0? 0 : 0x11);  // Huffman table selector
@@ -1058,7 +1059,7 @@ static int decode_jpeg(jpgstruct *jpg)
 	mcuw=_mcuw[jpg->subsamp];  mcuh=_mcuh[jpg->subsamp];
 	jpg->xmcus=(jpg->width+mcuw-1)/mcuw;
 	jpg->ymcus=(jpg->height+mcuh-1)/mcuh;
-	mcusize=mcuw*mcuh+ (jpg->flags&TJ_GRAYSCALE? 0:128);
+	mcusize=mcuw*mcuh+ (jpg->subsamp==TJ_GRAYSCALE? 0:128);
 
 	for(j=0; j<jpg->ymcus; j++)
 	{
@@ -1074,7 +1075,7 @@ static int decode_jpeg(jpgstruct *jpg)
 				jpg->jpgptr+=pos;  jpg->bytesprocessed+=pos;  jpg->bytesleft-=pos;
 			}
 
-			if(!(jpg->flags&TJ_GRAYSCALE))
+			if(jpg->subsamp!=TJ_GRAYSCALE)
 			{
 				// Huffman decode the Cb block
 				pos=0;  marker=0;
@@ -1094,7 +1095,7 @@ static int decode_jpeg(jpgstruct *jpg)
 
 			for(k=0; k<mcuw*mcuh; k+=64)  // Un-quantize the luminance blocks
 				_ipp(ippiQuantInv8x8_JPEG_16s_C1I(&jpg->mcubuf[k], jpg->lumqtable));
-			if(!(jpg->flags&TJ_GRAYSCALE))
+			if(jpg->subsamp!=TJ_GRAYSCALE)
 			{
 				for(k=mcuw*mcuh; k<mcusize; k+=64)  // Un-quantize the chrominance blocks
 					_ipp(ippiQuantInv8x8_JPEG_16s_C1I(&jpg->mcubuf[k], jpg->chromqtable));
