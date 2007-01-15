@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleGetInfoString</key>
-	<string>1.04, The VirtualGL Project</string>
+	<string>1.10, The VirtualGL Project</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.virtualgl.turbojpeg</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.04</string>
+	<string>1.10</string>
 	<key>IFMajorVersion</key>
 	<integer>1</integer>
 	<key>IFMinorVersion</key>
