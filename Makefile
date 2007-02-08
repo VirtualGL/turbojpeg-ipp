@@ -141,7 +141,7 @@ $(ODIR)/turbojpeg.o: turbojpegipp.c turbojpeg.h
 	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
 
 $(LDIR)/libturbojpeg.so: $(ODIR)/turbojpeg.o
-	$(CC) $(LDFLAGS) -shared $< -o $@ $(IPPLINK)
+	$(CC) $(LDFLAGS) -shared $< -o $@ $(IPPLINK) -Wl,--version-script,turbojpeg-mapfile
 
 ifeq ($(platform), linux)
 
