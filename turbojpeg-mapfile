@@ -1,4 +1,3 @@
-TURBOJPEG
 {
 	global:
 		tjInitCompress;
