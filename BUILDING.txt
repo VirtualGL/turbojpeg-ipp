@@ -14,6 +14,11 @@ How to build TurboJPEG
 
 -- RPM v4 or later (required to build a redistributable TurboJPEG package)
 
+-- binutils 2.12.90 or later.  This shouldn't be an issue unless you are
+   (still) running RedHat 7.x or Enterprise 2.1, in which case you can
+   download an updated bintools RPM from
+   http://mirror.atrpms.net/ccrma/mirror/7.2/
+
 
 *******************************************************************************
 **     Mac OS X (Intel) Prerequisites
