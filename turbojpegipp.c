@@ -44,6 +44,9 @@ static int ippstaticinitcalled=0;
 #define checkhandle(h) jpgstruct *jpg=(jpgstruct *)h; \
 	if(!jpg) {snprintf(lasterror, 1023, "%d: Invalid handle", __LINE__);  return -1;}
 
+#ifndef IPP_VERSION_MAJOR
+#include "ippversion.h"
+#endif
 #if IPP_VERSION_MAJOR>=5
 #define ippCoreGetStatusString ippGetStatusString
 #define ippCoreGetCpuType ippGetCpuType
