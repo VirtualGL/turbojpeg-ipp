@@ -94,11 +94,12 @@ dist: all
 else
 ##########################################################################
 
-TARGETS = $(LDIR)/libturbojpeg.so
+TARGETS = $(LDIR)/libturbojpeg.so \
+          $(LDIR)/libturbojpeg-libjpeg.so
 
-OBJS = $(ODIR)/turbojpeg.o
+OBJS = $(ODIR)/turbojpeg.o $(ODIR)/turbojpeg-libjpeg.o
 
-all: $(TARGETS)
+all: libjpeg $(TARGETS)
 
 clean:
 	-$(RM) $(TARGETS) $(OBJS)
@@ -142,6 +143,17 @@ $(ODIR)/turbojpeg.o: turbojpegipp.c turbojpeg.h
 
 $(LDIR)/libturbojpeg.so: $(ODIR)/turbojpeg.o turbojpeg-mapfile
 	$(CC) $(LDFLAGS) -shared $< -o $@ $(IPPLINK) -Wl,--version-script,turbojpeg-mapfile
+
+.PHONY: libjpeg
+libjpeg:
+	cd jpeg-6b; sh configure CC=$(CC); $(MAKE); cd ..
+
+$(ODIR)/turbojpeg-libjpeg.o: turbojpegl.c turbojpeg.h
+	$(CC) -Ijpeg-6b/ $(CFLAGS) -c $< -o $@
+
+$(LDIR)/libturbojpeg-libjpeg.so: $(ODIR)/turbojpeg-libjpeg.o \
+	turbojpeg-mapfile $(LDIR)/libjpeg.a
+	$(CC) $(LDFLAGS) -shared $< -o $@ $(LDIR)/libjpeg.a -Wl,--version-script,turbojpeg-mapfile
 
 ifeq ($(platform), linux)
 

@@ -18,22 +18,26 @@ ifeq ($(OS), Darwin)
  endif
 endif
 
+ifeq ($(TOPDIR),)
+TOPDIR = .
+endif
+
 ifeq ($(M32), yes)
  subplatform :=
 endif
 
 # Macros which are common to all Unix platforms
-VERSION := 1.10.2
+VERSION := 1.10.3
 BUILD := $(shell date +%Y%m%d)
 ifeq ($(DEBUG), yes)
 BUILD := $(BUILD)d
 endif
 
-BLDDIR = $(platform)$(subplatform)
-BLDDIR32 = $(platform)
+BLDDIR = $(TOPDIR)/$(platform)$(subplatform)
+BLDDIR32 = $(TOPDIR)/$(platform)
 ifeq ($(DEBUG), yes)
-BLDDIR := $(BLDDIR)/dbg
-BLDDIR32 := $(BLDDIR32)/dbg
+BLDDIR := $(TOPDIR)/$(BLDDIR)/dbg
+BLDDIR32 := $(TOPDIR)/$(BLDDIR32)/dbg
 endif
 
 ENAME = bin
@@ -54,7 +58,7 @@ _DUMMY3 := $(shell mkdir -p $(ODIR))
 RM = rm -f
 
 # System-specific macros
-include Makerules.$(platform)
+include $(TOPDIR)/Makerules.$(platform)
 
 CINCLUDES := -I.
 CDEFINES := $(CDEFINES) -D__VERSION=\"$(VERSION)\" -D__BUILD=\"$(BUILD)\"

@@ -19,10 +19,12 @@ default method of image compression.
 The Linux version of TurboJPEG is built using the Intel(R) Integrated
 Performance Primitives, a set of highly-optimized multimedia libraries for
 x86 processors.  The use of Intel(R) IPP allows TurboJPEG to compress
-1-megapixel images at 20-30 frames/sec or greater.
+1-megapixel images at 20-30 frames/sec or greater.  Unfortunately, this
+performance comes at the expense of introducing a closed source dependency.
+For those who may be concerned about this, a fully open source (but slower)
+version of the library is also included in this package.
 
-See README.txt included in this package for information about using TurboJPEG
-with your own applications.
+See the README.txt file included in this package for more information.
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -35,9 +37,12 @@ mkdir -p $RPM_BUILD_ROOT/usr/include
 
 %ifarch x86_64
 install -m 755 %{_libdir}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg.so
+install -m 755 %{_libdir}/libturbojpeg-libjpeg.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg-libjpeg.so
 install -m 755 %{_libdir32}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg.so
+install -m 755 %{_libdir32}/libturbojpeg-libjpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-libjpeg.so
 %else
 install -m 755 %{_libdir}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg.so
+install -m 755 %{_libdir}/libturbojpeg-libjpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-libjpeg.so
 %endif
 install -m 644 turbojpeg.h $RPM_BUILD_ROOT/usr/include/turbojpeg.h
 
@@ -56,8 +61,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc LGPL.txt LICENSE.txt README.txt
 
 /usr/lib/libturbojpeg.so
+/usr/lib/libturbojpeg-libjpeg.so
 %ifarch x86_64
 /usr/lib64/libturbojpeg.so
+/usr/lib64/libturbojpeg-libjpeg.so
 %endif
 /usr/include/turbojpeg.h
 
