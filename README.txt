@@ -26,10 +26,4 @@ A fully open source version of TurboJPEG, based on libjpeg, is also included
 with this distribution.  You can switch between the two using the "switchtjpeg"
 script (also included.)  Running "switchtjpeg libjpeg" will switch out the
 accelerated version of the TurboJPEG dynamic library with an unaccelerated
-version that is much slower but GPL-compatible.  This functionality was
-included as a compromise to ease the minds of others in the open source
-community, but it is our opinion that TurboJPEG can be considered an
-"independent and separate work" under the terms of the GPL and, therefore,
-this is a non-issue.  The GPL does not govern what one can load into an
-application at run time.  It only governs copying, distribution, and
-modification of an application.
+version that is much slower but GPL-compatible.
