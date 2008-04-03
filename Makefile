@@ -11,7 +11,7 @@ TARGETS = $(EDIR)/turbojpeg.dll \
           $(EDIR)/libjpeg/turbojpeg.dll \
           $(LDIR)/libjpeg/turbojpeg.lib
 
-OBJS = $(ODIR)/turbojpeg-ipp.obj $(ODIR)/turbojpeg-libjpeg.obj
+OBJS = $(ODIR)/ipp/turbojpeg.obj $(ODIR)/libjpeg/turbojpeg.obj
 
 all: libjpeg $(TARGETS)
 
