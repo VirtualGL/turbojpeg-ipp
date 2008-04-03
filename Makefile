@@ -66,10 +66,10 @@ ifeq ($(platform), osxx86)
 ##########################################################################
 
 TARGETS = $(LDIR)/libturbojpeg.dylib \
-          $(LDIR)/libturbojpeg-ipp.dylib \
-          $(LDIR)/libturbojpeg-libjpeg.dylib
+          $(LDIR)/ipp/libturbojpeg.dylib \
+          $(LDIR)/libjpeg/libturbojpeg.dylib
 
-OBJS = $(ODIR)/turbojpeg-ipp.o $(ODIR)/turbojpeg-libjpeg.o
+OBJS = $(ODIR)/ipp/turbojpeg.o $(ODIR)/libjpeg/turbojpeg.o
 
 all: libjpeg $(TARGETS)
 
@@ -88,25 +88,25 @@ IPPLINK = -L$(IPPDIR)/Libraries -lippj -lippi -lipps -lippcore -lguide \
           -install_name libturbojpeg.dylib
 endif
 
-$(ODIR)/turbojpeg-ipp.o: turbojpegipp.c turbojpeg.h
+$(ODIR)/ipp/turbojpeg.o: turbojpegipp.c turbojpeg.h
 	$(CC) -I$(IPPDIR)/Headers $(CFLAGS) -c $< -o $@
 
-$(LDIR)/libturbojpeg-ipp.dylib: $(ODIR)/turbojpeg-ipp.o
+$(LDIR)/ipp/libturbojpeg.dylib: $(ODIR)/ipp/turbojpeg.o
 	$(CC) $(LDFLAGS) -dynamiclib  $< -o $@ $(IPPLINK)
 
 .PHONY: libjpeg
 libjpeg:
 	cd jpeg-6b; sh configure CC=$(CC); $(MAKE); cd ..
 
-$(ODIR)/turbojpeg-libjpeg.o: turbojpegl.c turbojpeg.h
+$(ODIR)/libjpeg/turbojpeg.o: turbojpegl.c turbojpeg.h
 	$(CC) -Ijpeg-6b/ $(CFLAGS) -c $< -o $@
 
-$(LDIR)/libturbojpeg-libjpeg.dylib: $(ODIR)/turbojpeg-libjpeg.o \
-	$(LDIR)/libjpeg.a
-	$(CC) $(LDFLAGS) -dynamiclib $< -o $@ $(LDIR)/libjpeg.a \
+$(LDIR)/libjpeg/libturbojpeg.dylib: $(ODIR)/libjpeg/turbojpeg.o \
+	$(LDIR)/libjpeg/libjpeg.a
+	$(CC) $(LDFLAGS) -dynamiclib $< -o $@ $(LDIR)/libjpeg/libjpeg.a \
 		-install_name libturbojpeg.dylib
 
-$(LDIR)/libturbojpeg.dylib: $(LDIR)/libturbojpeg-ipp.dylib
+$(LDIR)/libturbojpeg.dylib: $(LDIR)/ipp/libturbojpeg.dylib
 	cp $< $@
 
 PACKAGEMAKER = /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker
@@ -123,8 +123,8 @@ dist: all
 	cat TurboJPEG.info.tmpl | sed s/{__VERSION}/$(VERSION)/g > $(BLDDIR)/pkgbuild/TurboJPEG.info
 	cat Info.plist.tmpl | sed s/{__VERSION}/$(VERSION)/g | sed s/{__BUILD}/$(BUILD)/g > $(BLDDIR)/pkgbuild/Info.plist
 	cp $(LDIR)/libturbojpeg.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
-	cp $(LDIR)/libturbojpeg-ipp.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
-	cp $(LDIR)/libturbojpeg-libjpeg.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	cp $(LDIR)/ipp/libturbojpeg.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib/libturbojpeg-ipp.dylib
+	cp $(LDIR)/libjpeg/libturbojpeg.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib/libturbojpeg-libjpeg.dylib
 	cp switchtjpeg $(BLDDIR)/pkgbuild/Package_Root/usr/bin
 	cp turbojpeg.h $(BLDDIR)/pkgbuild/Package_Root/usr/include
 	chmod 755 $(BLDDIR)/pkgbuild/Package_Root/usr/lib/*
