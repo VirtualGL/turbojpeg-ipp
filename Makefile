@@ -5,24 +5,49 @@ ifeq ($(platform), windows)
 ##########################################################################
 
 TARGETS = $(EDIR)/turbojpeg.dll \
-          $(LDIR)/turbojpeg.lib
+          $(LDIR)/turbojpeg.lib \
+          $(EDIR)/turbojpeg-ipp.dll \
+          $(LDIR)/turbojpeg-ipp.lib \
+          $(EDIR)/turbojpeg-libjpeg.dll \
+          $(LDIR)/turbojpeg-libjpeg.lib
 
-OBJS = $(ODIR)/turbojpeg.obj
+OBJS = $(ODIR)/turbojpeg-ipp.obj $(ODIR)/turbojpeg-libjpeg.obj
 
-all: $(TARGETS)
+all: libjpeg $(TARGETS)
 
 clean:
 	-$(RM) $(TARGETS) $(OBJS)
+	cd jpeg-6b; $(MAKE) -f makefile.vc clean; cd ..
 
 IPPLINK = ippjemerged.lib ippiemerged.lib ippsemerged.lib \
 	ippjmerged.lib ippimerged.lib ippsmerged.lib ippcorel.lib
 
-$(ODIR)/turbojpeg.obj: turbojpegipp.c turbojpeg.h
+$(ODIR)/turbojpeg-ipp.obj: turbojpegipp.c turbojpeg.h
 	$(CC) $(CFLAGS) -DDLLDEFINE -c $< -Fo$@
 
-$(EDIR)/turbojpeg.dll $(LDIR)/turbojpeg.lib: $(ODIR)/turbojpeg.obj $(JPEGDEP)
-	$(LINK) $(LDFLAGS) -dll $< -out:$(EDIR)/turbojpeg.dll \
-		-implib:$(LDIR)/turbojpeg.lib $(IPPLINK)
+$(EDIR)/turbojpeg-ipp.dll $(LDIR)/turbojpeg-ipp.lib: $(ODIR)/turbojpeg-ipp.obj
+	$(LINK) $(LDFLAGS) -dll $< -out:$(EDIR)/turbojpeg-ipp.dll \
+		-implib:$(LDIR)/turbojpeg-ipp.lib $(IPPLINK)
+
+.PHONY: libjpeg
+libjpeg:
+	cd jpeg-6b; \
+	diff -q jconfig.vc jconfig.h || cp jconfig.vc jconfig.h; \
+	$(MAKE) -f makefile.vc; cd ..
+
+$(ODIR)/turbojpeg-libjpeg.obj: turbojpegl.c
+	$(CC) -Ijpeg-6b/ $(CFLAGS) -DDLLDEFINE -c $< -Fo$@
+
+$(EDIR)/turbojpeg-libjpeg.dll $(LDIR)/turbojpeg-libjpeg.lib: \
+	$(ODIR)/turbojpeg-libjpeg.obj $(LDIR)/libjpeg.lib
+	$(LINK) $(LDFLAGS) -dll $< -out:$(EDIR)/turbojpeg-libjpeg.dll \
+		-implib:$(LDIR)/turbojpeg-libjpeg.lib $(LDIR)/libjpeg.lib
+
+$(EDIR)/turbojpeg.dll: $(EDIR)/turbojpeg-ipp.dll
+	cp $< $@
+
+$(LDIR)/turbojpeg.lib: $(LDIR)/turbojpeg-ipp.lib
+	cp $< $@
 
 WBLDDIR = $(platform)$(subplatform)
 
@@ -103,6 +128,8 @@ all: libjpeg $(TARGETS)
 
 clean:
 	-$(RM) $(TARGETS) $(OBJS)
+	cd jpeg-6b; \
+	$(MAKE) clean || (sh configure CC=$(CC); $(MAKE) clean); cd ..
 
 ifeq ($(IPPDIR),)
 IPPDIR = /opt/intel/ipp/5.1/ia32

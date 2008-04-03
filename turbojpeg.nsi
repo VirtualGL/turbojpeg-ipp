@@ -14,6 +14,9 @@ Section "TurboJPEG SDK (required)"
 	SectionIn RO
 	SetOutPath $SYSDIR
 	File "${BLDDIR}\bin\turbojpeg.dll"
+	File "${BLDDIR}\bin\turbojpeg-ipp.dll"
+	File "${BLDDIR}\bin\turbojpeg-libjpeg.dll"
+	File "switchtjpeg.bat"
 	SetOutPath $INSTDIR\lib
 	File "${BLDDIR}\lib\turbojpeg.lib"
 	SetOutPath $INSTDIR\include
@@ -40,6 +43,9 @@ Section "Uninstall"
 	DeleteRegKey HKLM "SOFTWARE\TurboJPEG ${VERSION}"
 
 	Delete $SYSDIR\turbojpeg.dll
+	Delete $SYSDIR\turbojpeg-ipp.dll
+	Delete $SYSDIR\turbojpeg-libjpeg.dll
+	Delete $SYSDIR\switchtjpeg.bat
 	Delete $INSTDIR\lib\turbojpeg.lib
 	Delete $INSTDIR\include\turbojpeg.h
 	Delete $INSTDIR\uninstall_${VERSION}.exe
