@@ -5,7 +5,7 @@ Vendor: The VirtualGL Project
 URL: http://www.virtualgl.org
 Group: System Environment/Libraries
 Release: %{_build}
-License: wxWindows Library License, v3
+License: wxWindows Library License, v3.1
 BuildRoot: %{_blddir}/%{name}-buildroot
 Prereq: /sbin/ldconfig
 Provides: %{name} = %{version}-%{release}
