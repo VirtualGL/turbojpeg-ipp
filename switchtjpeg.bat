@@ -11,7 +11,7 @@ echo USAGE: %0 {ipp / libjpeg}
 echo.
 echo ipp = Use the accelerated version of TurboJPEG which embeds functions from
 echo       the Intel(R) Integrated Performance Primitives
-echo libjpeg = Use the unaccelerated version of TurboJPEG which is
+echo libjpeg = Use the unaccelerated version of TurboJPEG, which is
 echo           GPL-compatible
 goto done
 
