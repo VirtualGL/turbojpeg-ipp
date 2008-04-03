@@ -37,15 +37,15 @@ mkdir -p $RPM_BUILD_ROOT/usr/include
 
 %ifarch x86_64
 install -m 755 %{_libdir}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg.so
-install -m 755 %{_libdir}/libturbojpeg-ipp.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg-ipp.so
-install -m 755 %{_libdir}/libturbojpeg-libjpeg.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg-libjpeg.so
+install -m 755 %{_libdir}/ipp/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg-ipp.so
+install -m 755 %{_libdir}/libjpeg/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg-libjpeg.so
 install -m 755 %{_libdir32}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg.so
-install -m 755 %{_libdir32}/libturbojpeg-ipp.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-ipp.so
-install -m 755 %{_libdir32}/libturbojpeg-libjpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-libjpeg.so
+install -m 755 %{_libdir32}/ipp/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-ipp.so
+install -m 755 %{_libdir32}/libjpeg/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-libjpeg.so
 %else
 install -m 755 %{_libdir}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg.so
-install -m 755 %{_libdir}/libturbojpeg-ipp.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-ipp.so
-install -m 755 %{_libdir}/libturbojpeg-libjpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-libjpeg.so
+install -m 755 %{_libdir}/ipp/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-ipp.so
+install -m 755 %{_libdir}/libjpeg/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-libjpeg.so
 %endif
 install -m 644 turbojpeg.h $RPM_BUILD_ROOT/usr/include/turbojpeg.h
 install -m 755 switchtjpeg $RPM_BUILD_ROOT/usr/bin/switchtjpeg
