@@ -6,10 +6,10 @@ ifeq ($(platform), windows)
 
 TARGETS = $(EDIR)/turbojpeg.dll \
           $(LDIR)/turbojpeg.lib \
-          $(EDIR)/turbojpeg-ipp.dll \
-          $(LDIR)/turbojpeg-ipp.lib \
-          $(EDIR)/turbojpeg-libjpeg.dll \
-          $(LDIR)/turbojpeg-libjpeg.lib
+          $(EDIR)/ipp/turbojpeg.dll \
+          $(LDIR)/ipp/turbojpeg.lib \
+          $(EDIR)/libjpeg/turbojpeg.dll \
+          $(LDIR)/libjpeg/turbojpeg.lib
 
 OBJS = $(ODIR)/turbojpeg-ipp.obj $(ODIR)/turbojpeg-libjpeg.obj
 
@@ -22,12 +22,12 @@ clean:
 IPPLINK = ippjemerged.lib ippiemerged.lib ippsemerged.lib \
 	ippjmerged.lib ippimerged.lib ippsmerged.lib ippcorel.lib
 
-$(ODIR)/turbojpeg-ipp.obj: turbojpegipp.c turbojpeg.h
+$(ODIR)/ipp/turbojpeg.obj: turbojpegipp.c turbojpeg.h
 	$(CC) $(CFLAGS) -DDLLDEFINE -c $< -Fo$@
 
-$(EDIR)/turbojpeg-ipp.dll $(LDIR)/turbojpeg-ipp.lib: $(ODIR)/turbojpeg-ipp.obj
-	$(LINK) $(LDFLAGS) -dll $< -out:$(EDIR)/turbojpeg-ipp.dll \
-		-implib:$(LDIR)/turbojpeg-ipp.lib $(IPPLINK)
+$(EDIR)/ipp/turbojpeg.dll $(LDIR)/ipp/turbojpeg.lib: $(ODIR)/ipp/turbojpeg.obj
+	$(LINK) $(LDFLAGS) -dll $< -out:$(EDIR)/ipp/turbojpeg.dll \
+		-implib:$(LDIR)/ipp/turbojpeg.lib $(IPPLINK)
 
 .PHONY: libjpeg
 libjpeg:
@@ -35,18 +35,18 @@ libjpeg:
 	diff -q jconfig.vc jconfig.h || cp jconfig.vc jconfig.h; \
 	$(MAKE) -f makefile.vc; cd ..
 
-$(ODIR)/turbojpeg-libjpeg.obj: turbojpegl.c
+$(ODIR)/libjpeg/turbojpeg.obj: turbojpegl.c
 	$(CC) -Ijpeg-6b/ $(CFLAGS) -DDLLDEFINE -c $< -Fo$@
 
-$(EDIR)/turbojpeg-libjpeg.dll $(LDIR)/turbojpeg-libjpeg.lib: \
-	$(ODIR)/turbojpeg-libjpeg.obj $(LDIR)/libjpeg.lib
-	$(LINK) $(LDFLAGS) -dll $< -out:$(EDIR)/turbojpeg-libjpeg.dll \
-		-implib:$(LDIR)/turbojpeg-libjpeg.lib $(LDIR)/libjpeg.lib
+$(EDIR)/libjpeg/turbojpeg.dll $(LDIR)/libjpeg/turbojpeg.lib: \
+	$(ODIR)/libjpeg/turbojpeg.obj $(LDIR)/libjpeg/libjpeg.lib
+	$(LINK) $(LDFLAGS) -dll $< -out:$(EDIR)/libjpeg/turbojpeg.dll \
+		-implib:$(LDIR)/libjpeg/turbojpeg.lib $(LDIR)/libjpeg/libjpeg.lib
 
-$(EDIR)/turbojpeg.dll: $(EDIR)/turbojpeg-ipp.dll
+$(EDIR)/turbojpeg.dll: $(EDIR)/ipp/turbojpeg.dll
 	cp $< $@
 
-$(LDIR)/turbojpeg.lib: $(LDIR)/turbojpeg-ipp.lib
+$(LDIR)/turbojpeg.lib: $(LDIR)/ipp/turbojpeg.lib
 	cp $< $@
 
 WBLDDIR = $(platform)$(subplatform)

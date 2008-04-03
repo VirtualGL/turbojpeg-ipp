@@ -54,6 +54,12 @@ ODIR32 := $(BLDDIR32)/$(ONAME)
 _DUMMY := $(shell mkdir -p $(EDIR))
 _DUMMY2 := $(shell mkdir -p $(LDIR))
 _DUMMY3 := $(shell mkdir -p $(ODIR))
+_DUMMY4 := $(shell mkdir -p $(EDIR)/ipp)
+_DUMMY5 := $(shell mkdir -p $(LDIR)/ipp)
+_DUMMY6 := $(shell mkdir -p $(ODIR)/ipp)
+_DUMMY7 := $(shell mkdir -p $(EDIR)/libjpeg)
+_DUMMY8 := $(shell mkdir -p $(LDIR)/libjpeg)
+_DUMMY9 := $(shell mkdir -p $(ODIR)/libjpeg)
 
 RM = rm -f
 

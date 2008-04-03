@@ -14,8 +14,8 @@ Section "TurboJPEG SDK (required)"
 	SectionIn RO
 	SetOutPath $SYSDIR
 	File "${BLDDIR}\bin\turbojpeg.dll"
-	File "${BLDDIR}\bin\turbojpeg-ipp.dll"
-	File "${BLDDIR}\bin\turbojpeg-libjpeg.dll"
+	File "/oname=turbojpeg-ipp.dll" "${BLDDIR}\bin\ipp\turbojpeg.dll"
+	File "/oname=turbojpeg-libjpeg.dll" "${BLDDIR}\bin\libjpeg\turbojpeg.dll"
 	File "switchtjpeg.bat"
 	SetOutPath $INSTDIR\lib
 	File "${BLDDIR}\lib\turbojpeg.lib"

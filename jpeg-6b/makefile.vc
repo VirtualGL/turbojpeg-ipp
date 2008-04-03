@@ -10,6 +10,10 @@
 TOPDIR = ..
 include $(TOPDIR)/Makerules
 
+EDIR := $(EDIR)/libjpeg
+LDIR := $(LDIR)/libjpeg
+ODIR := $(ODIR)/libjpeg
+
 $(ODIR)/%.obj: %.c
 	$(CC) $(CFLAGS) -c $< -Fo$@
 
