@@ -146,10 +146,10 @@ else
 ##########################################################################
 
 TARGETS = $(LDIR)/libturbojpeg.so \
-          $(LDIR)/libturbojpeg-ipp.so \
-          $(LDIR)/libturbojpeg-libjpeg.so
+          $(LDIR)/ipp/libturbojpeg.so \
+          $(LDIR)/libjpeg/libturbojpeg.so
 
-OBJS = $(ODIR)/turbojpeg-ipp.o $(ODIR)/turbojpeg-libjpeg.o
+OBJS = $(ODIR)/ipp/turbojpeg.o $(ODIR)/libjpeg/turbojpeg.o
 
 all: libjpeg $(TARGETS)
 
@@ -192,24 +192,26 @@ IPPLINK = -L$(IPPDIR)/lib \
         -lippji7 -lippii7 -lippsi7 -lippcore64
 endif
 
-$(ODIR)/turbojpeg-ipp.o: turbojpegipp.c turbojpeg.h
+$(ODIR)/ipp/turbojpeg.o: turbojpegipp.c turbojpeg.h
 	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
 
-$(LDIR)/libturbojpeg-ipp.so: $(ODIR)/turbojpeg-ipp.o turbojpeg-mapfile
-	$(CC) $(LDFLAGS) -shared $< -o $@ $(IPPLINK) -Wl,--version-script,turbojpeg-mapfile
+$(LDIR)/ipp/libturbojpeg.so: $(ODIR)/ipp/turbojpeg.o turbojpeg-mapfile
+	$(CC) $(LDFLAGS) -shared $< -o $@ $(IPPLINK) \
+		-Wl,--version-script,turbojpeg-mapfile
 
 .PHONY: libjpeg
 libjpeg:
 	cd jpeg-6b; sh configure CC=$(CC); $(MAKE); cd ..
 
-$(ODIR)/turbojpeg-libjpeg.o: turbojpegl.c turbojpeg.h
+$(ODIR)/libjpeg/turbojpeg.o: turbojpegl.c turbojpeg.h
 	$(CC) -Ijpeg-6b/ $(CFLAGS) -c $< -o $@
 
-$(LDIR)/libturbojpeg-libjpeg.so: $(ODIR)/turbojpeg-libjpeg.o \
-	turbojpeg-mapfile $(LDIR)/libjpeg.a
-	$(CC) $(LDFLAGS) -shared $< -o $@ $(LDIR)/libjpeg.a -Wl,--version-script,turbojpeg-mapfile
+$(LDIR)/libjpeg/libturbojpeg.so: $(ODIR)/libjpeg/turbojpeg.o \
+	turbojpeg-mapfile $(LDIR)/libjpeg/libjpeg.a
+	$(CC) $(LDFLAGS) -shared $< -o $@ $(LDIR)/libjpeg/libjpeg.a \
+		-Wl,--version-script,turbojpeg-mapfile
 
-$(LDIR)/libturbojpeg.so: $(LDIR)/libturbojpeg-ipp.so
+$(LDIR)/libturbojpeg.so: $(LDIR)/ipp/libturbojpeg.so
 	cp $< $@
 
 ifeq ($(platform), linux)
