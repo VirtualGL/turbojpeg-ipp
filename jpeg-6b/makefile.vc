@@ -7,8 +7,11 @@
 
 # Read installation instructions before saying "make" !!
 
-TOPDIR = ../..
+TOPDIR = ..
 include $(TOPDIR)/Makerules
+
+$(ODIR)/%.obj: %.c
+	$(CC) $(CFLAGS) -c $< -Fo$@
 
 # Put here the object file name for the correct system-dependent memory
 # manager file.  For NT we suggest jmemnobs.obj, which expects the OS to
@@ -82,7 +85,7 @@ all: $(LDIR)/libjpeg.lib $(EDIR)/cjpeg.exe $(EDIR)/djpeg.exe $(EDIR)/jpegtran.ex
 
 $(LDIR)/libjpeg.lib: $(LIBOBJECTS)
 	$(RM) $(LDIR)/libjpeg.lib
-	$(AR) -out:$(LDIR)/libjpeg.lib  $(LIBOBJECTS)
+	"link" -lib -nologo -out:$(LDIR)/libjpeg.lib  $(LIBOBJECTS)
 
 $(EDIR)/cjpeg.exe: $(COBJECTS) $(LDIR)/libjpeg.lib
 	$(LINK) $(LDFLAGS) -out:$(EDIR)/cjpeg.exe $(COBJECTS) $(LDIR)/libjpeg.lib $(LDLIBS)
