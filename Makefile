@@ -120,9 +120,10 @@ else
 ##########################################################################
 
 TARGETS = $(LDIR)/libturbojpeg.so \
+          $(LDIR)/libturbojpeg-ipp.so \
           $(LDIR)/libturbojpeg-libjpeg.so
 
-OBJS = $(ODIR)/turbojpeg.o $(ODIR)/turbojpeg-libjpeg.o
+OBJS = $(ODIR)/turbojpeg-ipp.o $(ODIR)/turbojpeg-libjpeg.o
 
 all: libjpeg $(TARGETS)
 
@@ -165,10 +166,10 @@ IPPLINK = -L$(IPPDIR)/lib \
         -lippji7 -lippii7 -lippsi7 -lippcore64
 endif
 
-$(ODIR)/turbojpeg.o: turbojpegipp.c turbojpeg.h
+$(ODIR)/turbojpeg-ipp.o: turbojpegipp.c turbojpeg.h
 	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
 
-$(LDIR)/libturbojpeg.so: $(ODIR)/turbojpeg.o turbojpeg-mapfile
+$(LDIR)/libturbojpeg-ipp.so: $(ODIR)/turbojpeg-ipp.o turbojpeg-mapfile
 	$(CC) $(LDFLAGS) -shared $< -o $@ $(IPPLINK) -Wl,--version-script,turbojpeg-mapfile
 
 .PHONY: libjpeg
@@ -181,6 +182,9 @@ $(ODIR)/turbojpeg-libjpeg.o: turbojpegl.c turbojpeg.h
 $(LDIR)/libturbojpeg-libjpeg.so: $(ODIR)/turbojpeg-libjpeg.o \
 	turbojpeg-mapfile $(LDIR)/libjpeg.a
 	$(CC) $(LDFLAGS) -shared $< -o $@ $(LDIR)/libjpeg.a -Wl,--version-script,turbojpeg-mapfile
+
+$(LDIR)/libturbojpeg.so: $(LDIR)/libturbojpeg-ipp.so
+	cp $< $@
 
 ifeq ($(platform), linux)
 

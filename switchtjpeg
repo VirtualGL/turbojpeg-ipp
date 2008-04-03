@@ -1,0 +1,51 @@
+#!/bin/sh
+
+docopy()
+{
+	if [ ! -f $TJSRC ]; then
+		echo $TJSRC does not exist
+		return
+	fi
+	cp $TJSRC $TJDST
+}
+
+UNAME_M=`uname -m`
+MYDIR=`dirname $0`
+
+if [ "$1" = "ipp" ]; then
+
+	TJSRC=$MYDIR/../lib/libturbojpeg-ipp.so
+	TJDST=$MYDIR/../lib/libturbojpeg.so
+	docopy
+
+	if [ "$UNAME_M" = "x86_64" ]; then
+		TJSRC=$MYDIR/../lib64/libturbojpeg-ipp.so
+		TJDST=$MYDIR/../lib64/libturbojpeg.so
+		docopy
+	fi
+
+elif [ "$1" = "libjpeg" ]; then
+
+	TJSRC=$MYDIR/../lib/libturbojpeg-libjpeg.so
+	TJDST=$MYDIR/../lib/libturbojpeg.so
+	docopy
+
+	if [ "$UNAME_M" = "x86_64" ]; then
+		TJSRC=$MYDIR/../lib64/libturbojpeg-libjpeg.so
+		TJDST=$MYDIR/../lib64/libturbojpeg.so
+		docopy
+	fi
+
+else
+
+	echo
+	echo "USAGE: $0 < ipp | libjpeg >"
+	echo
+	echo "ipp = Use the accelerated version of TurboJPEG which embeds functions from"
+	echo "      the Intel(R) Integrated Performance Primitives"
+	echo "libjpeg = Use the unaccelerated version of TurboJPEG, which is"
+	echo "          GPL-compatible"
+	echo
+	exit 1
+
+fi

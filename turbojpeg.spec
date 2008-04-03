@@ -37,14 +37,18 @@ mkdir -p $RPM_BUILD_ROOT/usr/include
 
 %ifarch x86_64
 install -m 755 %{_libdir}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg.so
+install -m 755 %{_libdir}/libturbojpeg-ipp.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg-ipp.so
 install -m 755 %{_libdir}/libturbojpeg-libjpeg.so $RPM_BUILD_ROOT/usr/lib64/libturbojpeg-libjpeg.so
 install -m 755 %{_libdir32}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg.so
+install -m 755 %{_libdir32}/libturbojpeg-ipp.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-ipp.so
 install -m 755 %{_libdir32}/libturbojpeg-libjpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-libjpeg.so
 %else
 install -m 755 %{_libdir}/libturbojpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg.so
+install -m 755 %{_libdir}/libturbojpeg-ipp.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-ipp.so
 install -m 755 %{_libdir}/libturbojpeg-libjpeg.so $RPM_BUILD_ROOT/usr/lib/libturbojpeg-libjpeg.so
 %endif
 install -m 644 turbojpeg.h $RPM_BUILD_ROOT/usr/include/turbojpeg.h
+install -m 755 switchtjpeg $RPM_BUILD_ROOT/usr/bin/switchtjpeg
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -61,11 +65,14 @@ rm -rf $RPM_BUILD_ROOT
 %doc LGPL.txt LICENSE.txt README.txt
 
 /usr/lib/libturbojpeg.so
+/usr/lib/libturbojpeg-ipp.so
 /usr/lib/libturbojpeg-libjpeg.so
 %ifarch x86_64
 /usr/lib64/libturbojpeg.so
+/usr/lib64/libturbojpeg-ipp.so
 /usr/lib64/libturbojpeg-libjpeg.so
 %endif
 /usr/include/turbojpeg.h
+/usr/bin/switchtjpeg
 
 %changelog
