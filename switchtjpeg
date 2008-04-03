@@ -10,29 +10,31 @@ docopy()
 }
 
 UNAME_M=`uname -m`
+SHEXT=so
+if [ "`uname -s`" = "Darwin" ]; then SHEXT=dylib; fi
 MYDIR=`dirname $0`
 
 if [ "$1" = "ipp" ]; then
 
-	TJSRC=$MYDIR/../lib/libturbojpeg-ipp.so
-	TJDST=$MYDIR/../lib/libturbojpeg.so
+	TJSRC=$MYDIR/../lib/libturbojpeg-ipp.$SHEXT
+	TJDST=$MYDIR/../lib/libturbojpeg.$SHEXT
 	docopy
 
 	if [ "$UNAME_M" = "x86_64" ]; then
-		TJSRC=$MYDIR/../lib64/libturbojpeg-ipp.so
-		TJDST=$MYDIR/../lib64/libturbojpeg.so
+		TJSRC=$MYDIR/../lib64/libturbojpeg-ipp.$SHEXT
+		TJDST=$MYDIR/../lib64/libturbojpeg.$SHEXT
 		docopy
 	fi
 
 elif [ "$1" = "libjpeg" ]; then
 
-	TJSRC=$MYDIR/../lib/libturbojpeg-libjpeg.so
-	TJDST=$MYDIR/../lib/libturbojpeg.so
+	TJSRC=$MYDIR/../lib/libturbojpeg-libjpeg.$SHEXT
+	TJDST=$MYDIR/../lib/libturbojpeg.$SHEXT
 	docopy
 
 	if [ "$UNAME_M" = "x86_64" ]; then
-		TJSRC=$MYDIR/../lib64/libturbojpeg-libjpeg.so
-		TJDST=$MYDIR/../lib64/libturbojpeg.so
+		TJSRC=$MYDIR/../lib64/libturbojpeg-libjpeg.$SHEXT
+		TJDST=$MYDIR/../lib64/libturbojpeg.$SHEXT
 		docopy
 	fi
 

@@ -65,14 +65,18 @@ else
 ifeq ($(platform), osxx86)
 ##########################################################################
 
-TARGETS = $(LDIR)/libturbojpeg.dylib
+TARGETS = $(LDIR)/libturbojpeg.dylib \
+          $(LDIR)/libturbojpeg-ipp.dylib \
+          $(LDIR)/libturbojpeg-libjpeg.dylib
 
-OBJS = $(ODIR)/turbojpeg.o
+OBJS = $(ODIR)/turbojpeg-ipp.o $(ODIR)/turbojpeg-libjpeg.o
 
-all: $(TARGETS)
+all: libjpeg $(TARGETS)
 
 clean:
 	-$(RM) $(TARGETS) $(OBJS)
+	cd jpeg-6b; \
+	$(MAKE) clean || (sh configure CC=$(CC); $(MAKE) clean); cd ..
 
 IPPDIR = /Library/Frameworks/Intel_IPP.framework
 IPPLINK = -L$(IPPDIR)/Libraries $(IPPDIR)/Libraries/libippcore.a \
@@ -84,11 +88,26 @@ IPPLINK = -L$(IPPDIR)/Libraries -lippj -lippi -lipps -lippcore -lguide \
           -install_name libturbojpeg.dylib
 endif
 
-$(ODIR)/turbojpeg.o: turbojpegipp.c turbojpeg.h
+$(ODIR)/turbojpeg-ipp.o: turbojpegipp.c turbojpeg.h
 	$(CC) -I$(IPPDIR)/Headers $(CFLAGS) -c $< -o $@
 
-$(LDIR)/libturbojpeg.dylib: $(ODIR)/turbojpeg.o
+$(LDIR)/libturbojpeg-ipp.dylib: $(ODIR)/turbojpeg-ipp.o
 	$(CC) $(LDFLAGS) -dynamiclib  $< -o $@ $(IPPLINK)
+
+.PHONY: libjpeg
+libjpeg:
+	cd jpeg-6b; sh configure CC=$(CC); $(MAKE); cd ..
+
+$(ODIR)/turbojpeg-libjpeg.o: turbojpegl.c turbojpeg.h
+	$(CC) -Ijpeg-6b/ $(CFLAGS) -c $< -o $@
+
+$(LDIR)/libturbojpeg-libjpeg.dylib: $(ODIR)/turbojpeg-libjpeg.o \
+	$(LDIR)/libjpeg.a
+	$(CC) $(LDFLAGS) -dynamiclib $< -o $@ $(LDIR)/libjpeg.a \
+		-install_name libturbojpeg.dylib
+
+$(LDIR)/libturbojpeg.dylib: $(LDIR)/libturbojpeg-ipp.dylib
+	cp $< $@
 
 PACKAGEMAKER = /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker
 
@@ -98,17 +117,24 @@ dist: all
 	if [ -f $(BLDDIR)/TurboJPEG-$(VERSION).dmg ]; then rm -f $(BLDDIR)/TurboJPEG-$(VERSION).dmg; fi
 	mkdir -p $(BLDDIR)/pkgbuild
 	mkdir -p $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	mkdir -p $(BLDDIR)/pkgbuild/Package_Root/usr/bin
 	mkdir -p $(BLDDIR)/pkgbuild/Package_Root/usr/include
 	mkdir -p $(BLDDIR)/pkgbuild/Resources
+	cat TurboJPEG.info.tmpl | sed s/{__VERSION}/$(VERSION)/g > $(BLDDIR)/pkgbuild/TurboJPEG.info
+	cat Info.plist.tmpl | sed s/{__VERSION}/$(VERSION)/g | sed s/{__BUILD}/$(BUILD)/g > $(BLDDIR)/pkgbuild/Info.plist
 	cp $(LDIR)/libturbojpeg.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	cp $(LDIR)/libturbojpeg-ipp.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	cp $(LDIR)/libturbojpeg-libjpeg.dylib $(BLDDIR)/pkgbuild/Package_Root/usr/lib
+	cp switchtjpeg $(BLDDIR)/pkgbuild/Package_Root/usr/bin
 	cp turbojpeg.h $(BLDDIR)/pkgbuild/Package_Root/usr/include
 	chmod 755 $(BLDDIR)/pkgbuild/Package_Root/usr/lib/*
+	chmod 755 $(BLDDIR)/pkgbuild/Package_Root/usr/bin/*
 	chmod 644 $(BLDDIR)/pkgbuild/Package_Root/usr/include/*
 	sudo chown -R root:wheel $(BLDDIR)/pkgbuild/Package_Root/*
 	cp License.rtf Welcome.rtf ReadMe.rtf $(BLDDIR)/pkgbuild/Resources/
 	$(PACKAGEMAKER) -build -v -p $(BLDDIR)/TurboJPEG-$(VERSION).pkg \
 	  -f $(BLDDIR)/pkgbuild/Package_Root -r $(BLDDIR)/pkgbuild/Resources \
-	  -i Info.plist -d TurboJPEG.info
+	  -i $(BLDDIR)/pkgbuild/Info.plist -d $(BLDDIR)/pkgbuild/TurboJPEG.info
 	sudo rm -rf $(BLDDIR)/pkgbuild
 	hdiutil create -fs HFS+ -volname TurboJPEG-$(VERSION) \
 	  -srcfolder $(BLDDIR)/TurboJPEG-$(VERSION).pkg \
