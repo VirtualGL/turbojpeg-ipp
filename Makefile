@@ -78,8 +78,8 @@ clean:
 	cd jpeg-6b; \
 	$(MAKE) clean || (sh configure CC=$(CC); $(MAKE) clean); cd ..
 
-IPPDIR = /Library/Frameworks/Intel_IPP.framework
-IPPLINK = -L$(IPPDIR)/Libraries $(IPPDIR)/Libraries/libippcore.a \
+IPPDIR = /Library/Frameworks/Intel_IPP.framework/Versions/5.3.4.075/em64t
+IPPLINK = -L$(IPPDIR)/lib -lippcore \
         -lippjemerged -lippiemerged -lippsemerged \
         -lippjmerged -lippimerged -lippsmerged \
         -install_name libturbojpeg.dylib -read_only_relocs warning
