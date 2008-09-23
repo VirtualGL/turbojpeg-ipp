@@ -59,10 +59,11 @@ How to build TurboJPEG
 -- Intel(R) Integrated Performance Primitives v4.1 or later
    * See http://www.intel.com/software/products/ipp/index.htm
    * Add the IPP include path (e.g.
-     c:\Program Files\Intel\IPP\5.1\ia32\include) to your system INCLUDE
+     c:\Program Files\Intel\IPP\5.3.4.087\ia32\include) to your system INCLUDE
      environment variable prior to building TurboJPEG.
-   * Add the IPP library path (e.g. c:\Program Files\Intel\IPP\5.1\ia32\lib) to
-     your system LIB environment variable prior to building TurboJPEG.
+   * Add the IPP library path
+     (e.g. c:\Program Files\Intel\IPP\5.3.4.087\ia32\lib) to your system LIB
+     environment variable prior to building TurboJPEG.
 
 -- Nullsoft Install System (http://nsis.sourceforge.net/) required to build a
    redistributable TurboJPEG package.  makensis.exe should be in your PATH.
@@ -118,8 +119,8 @@ Linux-Specific
 IPPDIR = {location of Intel Performance Primitives directory}
 
   * This allows you to override the default location of
-    /opt/intel/ipp/5.1/{ia32|em64t|itanium}, for instance to use an earlier or
-    later version of IPP.
+    /opt/intel/ipp/5.3.4.080/{ia32|em64t|itanium}, for instance to use an
+    earlier or later version of IPP.
 
 IPPSHARED = yes
 
