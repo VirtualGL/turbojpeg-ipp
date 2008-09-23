@@ -21,6 +21,12 @@ DEFAULTJPEGLIB = ipp
 
 ifeq ($(subplatform),)
 RPMARCH = i386
+DEBARCH = i386
 else
 RPMARCH = $(ARCH)
+ifeq ($(subplatform),64)
+DEBARCH = amd64
+else
+DEBARCH = $(ARCH)
+endif
 endif
