@@ -12,7 +12,8 @@ How to build TurboJPEG
 -- Intel(R) Integrated Performance Primitives v4.1 or later
    * See http://www.intel.com/software/products/ipp/index.htm
 
--- RPM v4 or later (required to build a redistributable TurboJPEG package)
+-- RPM v4 or later or DPKG (required to build a redistributable TurboJPEG
+   package)
 
 -- binutils 2.12.90 or later.  This shouldn't be an issue unless you are
    (still) running RedHat 7.x or Enterprise 2.1, in which case you can
@@ -79,8 +80,15 @@ How to build TurboJPEG
 **     Building a redistributable package
 *******************************************************************************
 
-  cd turbojpeg-ipp
-  make dist
+-- Building an RPM package
+
+   cd turbojpeg-ipp
+   make dist
+
+-- Building a DEB package
+
+   cd turbojpeg-ipp
+   make deb
 
 
 *******************************************************************************
