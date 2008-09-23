@@ -24,6 +24,11 @@ if [ "$1" = "ipp" ]; then
 		TJSRC=$MYDIR/../lib64/libturbojpeg-ipp.$SHEXT
 		TJDST=$MYDIR/../lib64/libturbojpeg.$SHEXT
 		docopy
+		if [ -d $MYDIR/../lib32 ]; then
+			TJSRC=$MYDIR/../lib32/libturbojpeg-ipp.$SHEXT
+			TJDST=$MYDIR/../lib32/libturbojpeg.$SHEXT
+			docopy
+		fi
 	fi
 
 elif [ "$1" = "libjpeg" ]; then
@@ -36,6 +41,11 @@ elif [ "$1" = "libjpeg" ]; then
 		TJSRC=$MYDIR/../lib64/libturbojpeg-libjpeg.$SHEXT
 		TJDST=$MYDIR/../lib64/libturbojpeg.$SHEXT
 		docopy
+		if [ -d $MYDIR/../lib32 ]; then
+			TJSRC=$MYDIR/../lib32/libturbojpeg-libjpeg.$SHEXT
+			TJDST=$MYDIR/../lib32/libturbojpeg.$SHEXT
+			docopy
+		fi
 	fi
 
 else
