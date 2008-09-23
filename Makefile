@@ -227,7 +227,7 @@ dist: all all32
 	if [ -d $(BLDDIR)/rpms ]; then rm -rf $(BLDDIR)/rpms; fi
 	mkdir -p $(BLDDIR)/rpms/RPMS
 	ln -fs `pwd` $(BLDDIR)/rpms/BUILD
-	rm -f $(BLDDIR)/turbojpeg.$(RPMARCH).rpm; \
+	rm -f $(BLDDIR)/turbojpeg-$(VERSION).$(RPMARCH).rpm; \
 	rpmbuild -bb --define "_blddir `pwd`/$(BLDDIR)" --define "_topdir $(BLDDIR)/rpms" \
 		--define "_bindir $(EDIR)" --define "_bindir32 $(EDIR32)" --define "_build $(BUILD)" \
 		--define "_libdir $(LDIR)" --define "_libdir32 $(LDIR32)" --target $(RPMARCH) \
@@ -236,7 +236,7 @@ dist: all all32
 	rm -rf $(BLDDIR)/rpms
 
 deb: all all32
-	rm -f $(BLDDIR)/turbojpeg_$(DEBARCH).deb
+	rm -f $(BLDDIR)/turbojpeg_$(VERSION)_$(DEBARCH).deb
 	umask 022; TMPDIR=`mktemp -d /tmp/vglbuild.XXXXXX`; \
 	mkdir $$TMPDIR/DEBIAN; \
 	cat deb-control.tmpl | sed s/{__VERSION}/$(VERSION)/g | sed s/{__BUILD}/$(BUILD)/g | sed s/{__ARCH}/$(DEBARCH)/g > $$TMPDIR/DEBIAN/control; \
@@ -259,7 +259,7 @@ deb: all all32
 	install -m 644 LICENSE.txt $$TMPDIR/usr/share/doc/turbojpeg-$(VERSION)-$(BUILD); \
 	install -m 644 README.txt $$TMPDIR/usr/share/doc/turbojpeg-$(VERSION)-$(BUILD); \
 	sudo chown -R root:root $$TMPDIR/*; \
-	dpkg -b $$TMPDIR $(BLDDIR)/turbojpeg_$(DEBARCH).deb; \
+	dpkg -b $$TMPDIR $(BLDDIR)/turbojpeg_$(VERSION)_$(DEBARCH).deb; \
 	sudo rm -rf $$TMPDIR
 
 endif
