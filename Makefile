@@ -159,12 +159,12 @@ clean:
 	$(MAKE) clean || (sh configure CC=$(CC); $(MAKE) clean); cd ..
 
 ifeq ($(IPPDIR),)
-IPPDIR = /opt/intel/ipp/5.1/ia32
+IPPDIR = /opt/intel/ipp/5.3.4.080/ia32
 ifeq ($(subplatform), 64)
-IPPDIR = /opt/intel/ipp/5.1/em64t
+IPPDIR = /opt/intel/ipp/5.3.4.080/em64t
 endif
 ifeq ($(subplatform), ia64)
-IPPDIR = /opt/intel/ipp/5.1/itanium
+IPPDIR = /opt/intel/ipp/5.3.4.080/itanium
 endif
 endif
 
@@ -227,13 +227,40 @@ dist: all all32
 	if [ -d $(BLDDIR)/rpms ]; then rm -rf $(BLDDIR)/rpms; fi
 	mkdir -p $(BLDDIR)/rpms/RPMS
 	ln -fs `pwd` $(BLDDIR)/rpms/BUILD
-	rm -f $(BLDDIR)/$(PACKAGENAME).$(RPMARCH).rpm; \
+	rm -f $(BLDDIR)/turbojpeg.$(RPMARCH).rpm; \
 	rpmbuild -bb --define "_blddir `pwd`/$(BLDDIR)" --define "_topdir $(BLDDIR)/rpms" \
 		--define "_bindir $(EDIR)" --define "_bindir32 $(EDIR32)" --define "_build $(BUILD)" \
 		--define "_libdir $(LDIR)" --define "_libdir32 $(LDIR32)" --target $(RPMARCH) \
 		--define "_version $(VERSION)" turbojpeg.spec; \
 	mv $(BLDDIR)/rpms/RPMS/$(RPMARCH)/turbojpeg-$(VERSION)-$(BUILD).$(RPMARCH).rpm $(BLDDIR)/turbojpeg-$(VERSION).$(RPMARCH).rpm
 	rm -rf $(BLDDIR)/rpms
+
+deb: all all32
+	rm -f $(BLDDIR)/turbojpeg_$(DEBARCH).deb
+	umask 022; TMPDIR=`mktemp -d /tmp/vglbuild.XXXXXX`; \
+	mkdir $$TMPDIR/DEBIAN; \
+	cat deb-control.tmpl | sed s/{__VERSION}/$(VERSION)/g | sed s/{__BUILD}/$(BUILD)/g | sed s/{__ARCH}/$(DEBARCH)/g > $$TMPDIR/DEBIAN/control; \
+	mkdir -p $$TMPDIR/usr/lib; \
+	install -m 755 $(LDIR)/libturbojpeg.so $$TMPDIR/usr/lib/libturbojpeg.so; \
+	install -m 755 $(LDIR)/ipp/libturbojpeg.so $$TMPDIR/usr/lib/libturbojpeg-ipp.so; \
+	install -m 755 $(LDIR)/libjpeg/libturbojpeg.so $$TMPDIR/usr/lib/libturbojpeg-libjpeg.so; \
+	if [ "$(subplatform)" = "64" ]; then \
+	mkdir -p $$TMPDIR/usr/lib32; \
+	install -m 755 $(LDIR32)/libturbojpeg.so $$TMPDIR/usr/lib32/libturbojpeg.so; \
+	install -m 755 $(LDIR32)/ipp/libturbojpeg.so $$TMPDIR/usr/lib32/libturbojpeg-ipp.so; \
+	install -m 755 $(LDIR32)/libjpeg/libturbojpeg.so $$TMPDIR/usr/lib32/libturbojpeg-libjpeg.so; \
+	fi; \
+	mkdir -p $$TMPDIR/usr/bin; \
+	install -m 755 switchtjpeg $$TMPDIR/usr/bin; \
+	mkdir -p $$TMPDIR/usr/include; \
+	install -m 644 turbojpeg.h $$TMPDIR/usr/include; \
+	mkdir -p $$TMPDIR/usr/share/doc/turbojpeg-$(VERSION)-$(BUILD); \
+	install -m 644 LGPL.txt $$TMPDIR/usr/share/doc/turbojpeg-$(VERSION)-$(BUILD); \
+	install -m 644 LICENSE.txt $$TMPDIR/usr/share/doc/turbojpeg-$(VERSION)-$(BUILD); \
+	install -m 644 README.txt $$TMPDIR/usr/share/doc/turbojpeg-$(VERSION)-$(BUILD); \
+	sudo chown -R root:root $$TMPDIR/*; \
+	dpkg -b $$TMPDIR $(BLDDIR)/turbojpeg_$(DEBARCH).deb; \
+	sudo rm -rf $$TMPDIR
 
 endif
 
