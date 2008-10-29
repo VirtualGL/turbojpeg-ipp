@@ -1,3 +1,4 @@
+
 /* Copyright (C)2004 Landmark Graphics
  * Copyright (C)2005, 2006 Sun Microsystems, Inc.
  *
@@ -414,11 +415,12 @@ static int e_mcu_color_convert(jpgstruct *jpg, int curxmcu, int curymcu)
 			if(jpg->ps==4)
 			{
 				_ipp(ippiCopy_8u_AC4C3R(bmpptr, jpg->pitch, tmpbuf, mcuw*3, imgsize));
-				_ipp(ippiMirror_8u_C3IR(tmpbuf, mcuw*3, imgsize, ippAxsHorizontal));
+				if(h>1) {_ipp(ippiMirror_8u_C3IR(tmpbuf, mcuw*3, imgsize, ippAxsHorizontal));}
 			}
 			else
 			{
-				_ipp(ippiMirror_8u_C3R(bmpptr, jpg->pitch, tmpbuf, mcuw*3, imgsize, ippAxsHorizontal));
+				if(h>1) {_ipp(ippiMirror_8u_C3R(bmpptr, jpg->pitch, tmpbuf, mcuw*3, imgsize, ippAxsHorizontal));}
+				else {_ipp(ippiCopy_8u_C3R(bmpptr, jpg->pitch, tmpbuf, mcuw*3, imgsize));}
 			}
 			if(mcuw>w)
 			{
@@ -866,12 +868,13 @@ static int d_mcu_color_convert(jpgstruct *jpg, int curxmcu, int curymcu)
 			bmpptr=bmpptr-(h-1)*jpg->pitch;
 			if(jpg->ps==4)
 			{
-				_ipp(ippiMirror_8u_C3IR(tmpbuf, mcuw*3, imgsize, ippAxsHorizontal));
+				if(h>1) {_ipp(ippiMirror_8u_C3IR(tmpbuf, mcuw*3, imgsize, ippAxsHorizontal));}
 				_ipp(ippiCopy_8u_C3AC4R(tmpbuf, mcuw*3, bmpptr, jpg->pitch, imgsize));
 			}
 			else
 			{
-				_ipp(ippiMirror_8u_C3R(tmpbuf, mcuw*3, bmpptr, jpg->pitch, imgsize, ippAxsHorizontal));
+				if(h>1) {_ipp(ippiMirror_8u_C3R(tmpbuf, mcuw*3, bmpptr, jpg->pitch, imgsize, ippAxsHorizontal));}
+				else {_ipp(ippiCopy_8u_C3R(tmpbuf, mcuw*3, bmpptr, jpg->pitch, imgsize));}
 			}
 		}
 		else
