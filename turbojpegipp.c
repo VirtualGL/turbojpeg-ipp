@@ -1,4 +1,3 @@
-
 /* Copyright (C)2004 Landmark Graphics
  * Copyright (C)2005, 2006 Sun Microsystems, Inc.
  *
