@@ -1,0 +1,58 @@
+1.11:
+-- Fixed a regression bug introduced in 1.10.4.  IPP 5.3 doesn't like it when
+ippiMirror_*() is called on a region with height 1.  Rather than simply copy
+the pixels as previous versions did, it trips an error.  This caused VirtualGL
+to abort with a message reading "Wrong value of data size" whenever the 3D
+image it was trying to compress was (n*8)+1 pixels in height.
+
+
+1.10.4:
+-- Rebuilt IPP version against Intel Performance Primitives v5.3u4 to pick up
+some bug fixes.
+-- Produced Ubuntu packages.  These will probably work on other Debian-
+compatible systems as well.
+
+
+1.10.3:
+-- Packaged IPP version of TurboJPEG alongside the libjpeg version, so that
+they can easily be switched at run time.
+
+
+1.10.2:
+-- Made version script anonymous to prevent backward compatibility issues
+
+
+1.10.1:
+-- Built Linux versions of libturbojpeg.so with a version script so that
+non-API symbols are hidden instead of global.  Since this affects only the
+Linux version, 1.10.1 packages were released only for that platform.  Other
+platforms still use the 1.10 packages.
+
+
+1.10:
+-- Grayscale JPEG compression/decompression support
+
+
+1.04.2:
+-- Made version script anonymous to prevent backward compatibility issues
+
+
+1.04.1:
+-- Built Linux versions of libturbojpeg.so with a version script so that
+non-API symbols are hidden instead of global.  Since this affects only the
+Linux version, 1.04.1 packages were released only for that platform.  Other
+platforms still use the 1.04 packages.
+
+
+1.04:
+-- Increased holding buffer size to account for corner cases in which the
+compression ratio can be < 1.  This fixes an issue whereby VirtualGL was
+aborting during the 3DS Max viewset of Viewperf 9 when the JPEG quality was
+set to 99 or 100.
+
+
+1.03:
+-- Built with IPP 5.1 (improves performance of x86-64 64-bit code)
+-- Repackaged as SDK -- must now install TurboJPEG prior to building VGL and
+TVNC on all platforms except Solaris
+-- Built MacIntel version
