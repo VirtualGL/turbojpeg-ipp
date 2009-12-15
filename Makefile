@@ -156,7 +156,7 @@ all: libjpeg $(TARGETS)
 clean:
 	-$(RM) $(TARGETS) $(OBJS)
 	cd jpeg-6b; \
-	$(MAKE) clean || (sh configure CC=$(CC); $(MAKE) clean); cd ..
+	$(MAKE) clean || (sh configure CC='$(CC)'; $(MAKE) clean); cd ..
 
 ifeq ($(IPPDIR),)
 IPPDIR = /opt/intel/ipp/5.3.4.080/ia32
@@ -201,7 +201,7 @@ $(LDIR)/ipp/libturbojpeg.so: $(ODIR)/ipp/turbojpeg.o turbojpeg-mapfile
 
 .PHONY: libjpeg
 libjpeg:
-	cd jpeg-6b; sh configure CC=$(CC); $(MAKE); cd ..
+	cd jpeg-6b; sh configure CC='$(CC)'; $(MAKE); cd ..
 
 $(ODIR)/libjpeg/turbojpeg.o: turbojpegl.c turbojpeg.h
 	$(CC) -Ijpeg-6b/ $(CFLAGS) -c $< -o $@
