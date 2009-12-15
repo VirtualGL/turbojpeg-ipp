@@ -1,3 +1,8 @@
+1.11.1:
+-- Removed blank lines from the DEBIAN/control file of the Debian packages.
+Since this only affected Debian packages, 1.11.1 packages were released only
+for that platform.  Other platforms still use the 1.11 packages.
+
 1.11:
 -- Fixed a regression bug introduced in 1.10.4.  IPP 5.3 doesn't like it when
 ippiMirror_*() is called on a region with height 1.  Rather than simply copy
