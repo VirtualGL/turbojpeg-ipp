@@ -1,4 +1,4 @@
-How to build TurboJPEG
+How to build TurboJPEG/IPP
 
 
 *******************************************************************************
@@ -12,7 +12,7 @@ How to build TurboJPEG
 -- Intel(R) Integrated Performance Primitives v4.1 or later
    * See http://www.intel.com/software/products/ipp/index.htm
 
--- RPM v4 or later or DPKG (required to build a redistributable TurboJPEG
+-- RPM v4 or later or DPKG (required to build a redistributable TurboJPEG/IPP
    package)
 
 -- binutils 2.12.90 or later.  This shouldn't be an issue unless you are
@@ -36,8 +36,8 @@ How to build TurboJPEG
    * See http://www.intel.com/software/products/ipp/index.htm
 
 -- OS X PackageMaker (part of the O/S)
-   * The TurboJPEG build tries to find this in its default location, but you
-     can specify an alternate location by setting the PACKAGEMAKER Makefile
+   * The TurboJPEG/IPP build tries to find this in its default location, but
+     you can specify an alternate location by setting the PACKAGEMAKER Makefile
      variable (see the Makefile Options section below.)
 
 
@@ -60,13 +60,13 @@ How to build TurboJPEG
    * See http://www.intel.com/software/products/ipp/index.htm
    * Add the IPP include path (e.g.
      c:\Program Files\Intel\IPP\5.3.4.087\ia32\include) to your system INCLUDE
-     environment variable prior to building TurboJPEG.
+     environment variable prior to building TurboJPEG/IPP.
    * Add the IPP library path
      (e.g. c:\Program Files\Intel\IPP\5.3.4.087\ia32\lib) to your system LIB
-     environment variable prior to building TurboJPEG.
+     environment variable prior to building TurboJPEG/IPP.
 
 -- Nullsoft Install System (http://nsis.sourceforge.net/) required to build a
-   redistributable TurboJPEG package.  makensis.exe should be in your PATH.
+   redistributable TurboJPEG/IPP package.  makensis.exe should be in your PATH.
 
 
 *******************************************************************************
@@ -103,15 +103,16 @@ General
 -------
 DEBUG = yes
 
-  * Build a version of TurboJPEG with debugging symbols and no optimization.
-    The debug version will reside in ${platform}/dbg/lib and
+  * Build a version of TurboJPEG/IPP with debugging symbols and no
+    optimization.  The debug version will reside in ${platform}/dbg/lib and
     ${platform}/dbg/bin, whereas the release version will reside in
     ${platform}/lib and ${platform}/bin, so these two versions can be built
     independently of one another.
 
 M32 = yes
 
-  * On x86-64 systems, this cross-compiles a 32-bit (x86) version of TurboJPEG.
+  * On x86-64 systems, this cross-compiles a 32-bit (x86) version of
+    TurboJPEG/IPP.
 
 --------------
 Linux-Specific
@@ -129,8 +130,8 @@ IPPSHARED = yes
 
     -- The IPP run-time RPM must be installed on the build machine.
     -- The IPP run-time RPM must be installed on any machine that will use
-       TurboJPEG.
-    -- TurboJPEG's CPU autodetection mechanism for non-Intel CPU's will no
+       TurboJPEG/IPP.
+    -- TurboJPEG/IPP's CPU autodetection mechanism for non-Intel CPU's will no
        longer work, and it is likely that the non-optimal (MMX) code path will
        be selected for non-Intel CPU's at run time.
 
