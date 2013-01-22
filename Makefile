@@ -147,7 +147,9 @@ else
 
 TARGETS = $(LDIR)/libturbojpeg.so \
           $(LDIR)/ipp/libturbojpeg.so \
-          $(LDIR)/libjpeg/libturbojpeg.so
+          $(LDIR)/libjpeg/libturbojpeg.so \
+          $(EDIR)/jpgtest \
+          $(EDIR)/jpegut
 
 OBJS = $(ODIR)/ipp/turbojpeg.o $(ODIR)/libjpeg/turbojpeg.o
 
@@ -213,6 +215,21 @@ $(LDIR)/libjpeg/libturbojpeg.so: $(ODIR)/libjpeg/turbojpeg.o \
 
 $(LDIR)/libturbojpeg.so: $(LDIR)/ipp/libturbojpeg.so
 	cp $< $@
+
+$(ODIR)/jpegut.o: jpegut.c turbojpeg.h
+	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
+
+$(EDIR)/jpegut: $(ODIR)/jpegut.o $(LDIR)/libturbojpeg.so
+	$(CC) $(LDFLAGS) -o $@ $^
+
+$(ODIR)/bmp.o: bmp.c bmp.h
+	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
+
+$(ODIR)/jpgtest.o: jpgtest.c turbojpeg.h
+	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
+
+$(EDIR)/jpgtest: $(ODIR)/jpgtest.o $(ODIR)/bmp.o $(LDIR)/libturbojpeg.so
+	$(CC) $(LDFLAGS) -o $@ $^ -lm
 
 ifeq ($(platform), linux)
 
