@@ -1,0 +1,5 @@
+# This script is a hack to build TurboJPEG/IPP against IPP 7.1 on Linux without
+# spending any more time than necessary trying to futz with the obsolete
+# TurboJPEG/IPP code base.
+
+make IPPDIR=/opt/intel/composer_xe_2013/ipp IPPLINK='-L$(IPPDIR)/lib/intel64 -Wl,-Bstatic -lippj_l -lippi_l -lipps_l -lippcore_l -Wl,-Bdynamic' ${1+"$@"}

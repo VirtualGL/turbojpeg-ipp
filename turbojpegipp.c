@@ -52,6 +52,9 @@ static int ippstaticinitcalled=0;
 #define ippCoreGetCpuType ippGetCpuType
 #define ippStaticInitBest ippStaticInit
 #endif
+#if IPP_VERSION_MAJOR>=7
+#define ippStaticInitCpu ippInitCpu
+#endif
 
 #define _throw(c) {snprintf(lasterror, 1023, "%d: %s", __LINE__, c);  return -1;}
 #define _ipp(a) {IppStatus __err;  if((__err=(a))<ippStsNoErr) _throw(ippCoreGetStatusString(__err));}
