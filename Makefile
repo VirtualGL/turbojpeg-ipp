@@ -220,7 +220,7 @@ $(ODIR)/jpegut.o: jpegut.c turbojpeg.h
 	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
 
 $(EDIR)/jpegut: $(ODIR)/jpegut.o $(LDIR)/libturbojpeg.so
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $(ODIR)/jpegut.o -L$(LDIR) -lturbojpeg
 
 $(ODIR)/bmp.o: bmp.c bmp.h
 	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
@@ -229,7 +229,7 @@ $(ODIR)/jpgtest.o: jpgtest.c turbojpeg.h
 	$(CC) -I$(IPPDIR)/include $(CFLAGS) -c $< -o $@
 
 $(EDIR)/jpgtest: $(ODIR)/jpgtest.o $(ODIR)/bmp.o $(LDIR)/libturbojpeg.so
-	$(CC) $(LDFLAGS) -o $@ $^ -lm
+	$(CC) $(LDFLAGS) -o $@ $(ODIR)/jpgtest.o $(ODIR)/bmp.o -lm -L$(LDIR) -lturbojpeg
 
 ifeq ($(platform), linux)
 
